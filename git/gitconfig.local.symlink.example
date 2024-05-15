@@ -1,0 +1,5 @@
+[user]
+        name = asierzapata
+        email = asier.zapata@gmail.com
+[credential]
+        helper = GIT_CREDENTIAL_HELPER
