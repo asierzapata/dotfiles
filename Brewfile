@@ -11,6 +11,7 @@ brew 'starship'
 brew 'zellij'
 brew 'htop'
 brew 'ollama'
+brew 'gh'
 
 cask '1password'
 cask 'alacritty'
