@@ -1,3 +1,10 @@
+import = [
+  "./catppuccin-latte.toml"
+]
+
+[window]
+option_as_alt="Both"
+
 [font]
 normal = { family = "MonaspiceNe Nerd Font", style = "Regular" }
 size = 14
