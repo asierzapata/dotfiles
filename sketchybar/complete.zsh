@@ -1,1 +1,1 @@
-brew services start sketchybar
+sketchybar -c sketchybarrc
