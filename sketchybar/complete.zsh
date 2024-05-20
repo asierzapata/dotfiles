@@ -1,1 +1,1 @@
-sketchybar -c sketchybarrc &
+sketchybar -c $HOME/.dotfiles/sketchybar/sketchybarrc &
