@@ -1,1 +1,1 @@
-sketchybar -c sketchybarrc
+sketchybar -c sketchybarrc &
