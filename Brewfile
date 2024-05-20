@@ -23,6 +23,7 @@ brew 'ripgrep'
 brew 'fzf'
 brew 'sst'
 brew 'lazygit'
+brew 'jq'
 
 cask '1password'
 cask 'alacritty'
