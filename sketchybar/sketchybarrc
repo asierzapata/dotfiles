@@ -1,16 +1,14 @@
 #!/bin/bash
 
-DIRECTORY="$HOME/.dotfiles/sketchybar"
-
-source "$DIRECTORY/colors.sh" # Loads all defined colors
+source "$CONFIG_DIR/colors.sh" # Loads all defined colors
 
 # This is a demo config to show some of the most important commands more easily.
 # This is meant to be changed and configured, as it is intentionally kept sparse.
 # For a more advanced configuration example see my dotfiles:
 # https://github.com/FelixKratz/dotfiles
 
-PLUGIN_DIR="$DIRECTORY/plugins"
-ITEM_DIR="$DIRECTORY/items"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+ITEM_DIR="$CONFIG_DIR/items"
 
 ##### Bar Appearance #####
 # Configuring the general appearance of the bar, these are only some of the
