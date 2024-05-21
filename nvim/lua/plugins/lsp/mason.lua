@@ -37,6 +37,8 @@ return {
 				"emmet_ls",
 				"prismals",
 				"pyright",
+				"gopls",
+				"rust_analyzer",
 			},
 		})
 
