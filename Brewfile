@@ -27,6 +27,7 @@ brew 'sst'
 brew 'lazygit'
 brew 'jq'
 brew 'sketchybar'
+brew 'go'
 
 cask '1password'
 cask 'alacritty'
