@@ -4,6 +4,9 @@ import = [
 
 [window]
 option_as_alt="Both"
+dynamic_padding=true
+decorations="Buttonless"
+blur=true
 
 [font]
 normal = { family = "MonaspiceNe Nerd Font", style = "Regular" }
