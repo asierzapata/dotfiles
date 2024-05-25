@@ -30,6 +30,7 @@ brew 'jq'
 brew 'sketchybar'
 brew 'go'
 brew 'qmk'
+brew 'tmux'
 
 cask '1password'
 cask 'alacritty'
