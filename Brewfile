@@ -31,6 +31,7 @@ brew 'sketchybar'
 brew 'go'
 brew 'qmk'
 brew 'tmux'
+brew 'btop'
 
 cask '1password'
 cask 'alacritty'
