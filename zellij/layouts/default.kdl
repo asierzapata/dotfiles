@@ -5,12 +5,11 @@ layout {
         }
         pane split_direction="vertical" {
             pane split_direction="horizontal" {
-                pane
-                pane command="htop"
+                pane borderless=true
             }
             pane split_direction="horizontal" {
-                pane
-                pane
+                pane borderless=true
+                pane borderless=true
             }
         }
         pane size=2 borderless=true {
@@ -21,7 +20,7 @@ layout {
         pane size=1 borderless=true {
             plugin location="zellij:compact-bar"
         }
-        pane command="gh" {
+        pane command="gh" borderless=true {
             args "dash"
         }
         pane size=2 borderless=true {
