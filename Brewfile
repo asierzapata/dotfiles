@@ -32,6 +32,8 @@ brew 'go'
 brew 'qmk'
 brew 'tmux'
 brew 'btop'
+brew 'koekeishiya/formulae/yabai'
+brew 'koekeishiya/formulae/skhd'
 
 cask '1password'
 cask 'alacritty'
