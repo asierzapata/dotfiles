@@ -10,4 +10,4 @@ blur=true
 
 [font]
 normal = { family = "MonaspiceNe Nerd Font", style = "Regular" }
-size = 14
+size = 16
