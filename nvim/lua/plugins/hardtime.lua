@@ -1,5 +1,6 @@
-return {
-	"m4xshen/hardtime.nvim",
-	dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
-	opts = {},
-}
+-- return {
+-- 	"m4xshen/hardtime.nvim",eturn {
+-- 	"m4xshen/hardtime.nvim",
+-- 	dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+-- 	opts = {},
+-- }
