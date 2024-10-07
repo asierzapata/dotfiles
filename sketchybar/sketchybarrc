@@ -19,7 +19,7 @@ ITEM_DIR="$CONFIG_DIR/items"
 
 sketchybar --bar height=37        \
                  blur_radius=30   \
-                 position=top     \
+                 position=bottom     \
                  sticky=off       \
                  padding_left=10  \
                  padding_right=10 \
@@ -32,7 +32,7 @@ sketchybar --bar height=37        \
 
 sketchybar --default icon.font="SF Pro:Semibold:15.0"  \
                      icon.color=$WHITE                 \
-                     label.font="Berkeley Mono Trial:Regular:15.0" \
+                     label.font="MonaspiceNe Nerd Font:Regular:15.0" \
                      label.color=$WHITE                \
                      background.color=$ITEM_BG_COLOR       \
                      background.corner_radius=5            \
