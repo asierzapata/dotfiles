@@ -1,5 +1,9 @@
 import = [
-  "./catppuccin-latte.toml"
+    # uncomment the flavour you want below:
+    # "~/.dotfiles/alacritty/catppuccin-latte.toml"
+    # "~/.dotfiles/alacritty/catppuccin-frappe.toml"
+    # "~/.dotfiles/alacritty/catppuccin-macchiato.toml"
+    "~/.dotfiles/alacritty/catppuccin-mocha.toml"
 ]
 
 [window]

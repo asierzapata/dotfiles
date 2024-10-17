@@ -37,7 +37,7 @@
   },
   "theme": {
     "mode": "system",
-    "dark": "Catpuccin Macchiato",
+    "dark": "Catpuccin Mocha",
     "light": "Catpuccin Latte"
   },
   "buffer_font_size": 16,
@@ -67,5 +67,6 @@
   },
   "explorer.position": "right",
   "default_dock_anchor": "right",
-  "dock": "right"
+  "dock": "right",
+  "relative_line_numbers": true
 }
