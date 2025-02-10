@@ -45,6 +45,7 @@ return {
 			}),
 			-- sources for autocompletion
 			sources = cmp.config.sources({
+				{ name = "copilot" }, -- github copilot
 				{ name = "nvim_lsp" }, -- language server protocol
 				{ name = "luasnip" }, -- snippets
 				{ name = "buffer" }, -- text within current buffer
@@ -53,9 +54,13 @@ return {
 
 			-- configure lspkind for vs-code like pictograms in completion menu
 			formatting = {
+				fields = { "abbr", "kind" },
+				expandable_indicator = true,
 				format = lspkind.cmp_format({
+					mode = "symbol",
 					maxwidth = 50,
 					ellipsis_char = "...",
+					symbol_map = { Copilot = "" },
 				}),
 			},
 		})
