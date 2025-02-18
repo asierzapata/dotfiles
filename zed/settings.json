@@ -15,6 +15,9 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "features": {
+    "edit_prediction_provider": "copilot"
+  },
   "outline_panel": {
     "dock": "right"
   },
@@ -40,7 +43,7 @@
     "dark": "Catpuccin Mocha",
     "light": "Catpuccin Latte"
   },
-  "buffer_font_size": 17.0,
+  "buffer_font_size": 16.0,
   "buffer_font_family": "MonaspiceNe Nerd Font",
   "buffer_font_features": {
     "ligatures": true,
