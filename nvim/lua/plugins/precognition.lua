@@ -23,4 +23,5 @@ return {
 			NextParagraph = { text = "}", prio = 1 },
 		},
 	},
+	enabled = false,
 }
