@@ -20,7 +20,7 @@ opt.smartcase = true -- if I include mixed cased, assumes case-sensitive search 
 opt.cursorline = true -- adds a highlight to the current cursor line
 
 opt.termguicolors = true
-opt.background = "dark" -- colorschemes that can be light or dark will be made dark
+opt.background = "light" -- colorschemes that can be light or dark will be made dark
 opt.signcolumn = "yes" -- show sign column so that text does not shift
 
 -- backspace
