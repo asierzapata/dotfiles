@@ -1,0 +1,30 @@
+{
+  "Log to the console": {
+    "prefix": "log",
+    "body": ["console.log('[${TM_FILENAME}:${TM_LINE_NUMBER}]', $1)", "$0"],
+    "description": "Log to the console"
+  },
+  "Log to the console (with variable name)": {
+    "prefix": "logvar",
+    "body": ["console.log('${1:variableName}:', ${1:variableName})", "$0"],
+    "description": "Log to the console (with variable name)"
+  },
+  // React
+  "React Functional Component": {
+    "prefix": "rfc",
+    "body": [
+      "import React from 'react';",
+      "",
+      "const ${1:ComponentName} = () => {",
+      "  return (",
+      "    <div>",
+      "      $0",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default ${1:ComponentName};"
+    ],
+    "description": "React Functional Component"
+  }
+}

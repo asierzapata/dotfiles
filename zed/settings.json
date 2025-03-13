@@ -15,6 +15,7 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "icon_theme": "Zed (Default)",
   "features": {
     "edit_prediction_provider": "copilot"
   },
@@ -30,7 +31,7 @@
   "assistant": {
     "default_model": {
       "provider": "copilot_chat",
-      "model": "claude-3-5-sonnet"
+      "model": "claude-3-7-sonnet"
     },
     "version": "2"
   },
@@ -40,8 +41,16 @@
   },
   "theme": {
     "mode": "system",
-    "dark": "Catpuccin Mocha",
-    "light": "Catpuccin Latte"
+    "dark": "XY-Zed",
+    "light": "One Light"
+  },
+  "ui_font_size": 16.0,
+  "ui_font_family": "MonaspiceNe Nerd Font",
+  "ui_font_features": {
+    "ligatures": true,
+    "font-variant-ligatures": true,
+    "font-variant-caps": true,
+    "font-variant-numeric": true
   },
   "buffer_font_size": 16.0,
   "buffer_font_family": "MonaspiceNe Nerd Font",
@@ -65,7 +74,7 @@
   "tab_bar": { "show": true },
   "show_nav_history_buttons": false,
   "toolbar": {
-    "breadcrumbs": true,
+    "breadcrumbs": false,
     "quick_actions": false
   },
   "explorer.position": "right",
