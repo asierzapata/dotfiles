@@ -35,6 +35,7 @@ brew 'koekeishiya/formulae/yabai'
 brew 'koekeishiya/formulae/skhd'
 brew 'colima'
 brew 'ranger'
+brew 'yazi'
 
 cask '1password'
 cask 'alacritty'
