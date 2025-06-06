@@ -67,7 +67,7 @@ button:hover {
 #workspaces button {
   margin: 0 4px;
   padding: 0 8px;
-  background-color: rgba(9, 9, 11, 0.5);
+  background-color: rgba(9, 9, 11, 0.75);
   color: #fafafa;
 }
 
@@ -108,7 +108,7 @@ button:hover {
 #power-profiles-daemon,
 #mpd {
   padding: 0 8px;
-  background-color: rgba(9, 9, 11, 0.5);
+  background-color: rgba(9, 9, 11, 0.75);
   color: #fafafa;
   border-radius: 4px;
 }
