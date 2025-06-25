@@ -8,7 +8,6 @@ cd "$(dirname $0)"/..
 
 if [ "$(uname -s)" == "Darwin" ]
 then
-  info "installing brew defined apps"
   brew bundle
 fi
 
