@@ -1,0 +1,10 @@
+{
+  "banner": "never",
+  "render_markdown": true,
+  "screen_reader": false,
+  "theme": "auto",
+  "trusted_folders": [
+    "/Users/asierzapata/Documents/Projects/Edpuzzle-Web",
+    "/Users/asierzapata/Documents/Projects/tragent"
+  ]
+}

@@ -1,0 +1,138 @@
+#!/bin/bash
+
+# Script to download subtitles and convert to markdown
+# Usage: ./download_subs.sh urls.txt
+
+set -e  # Exit on error
+
+# Configuration
+SUBTITLE_LANG="en"  # Change language if needed
+OUTPUT_DIR="subtitles"
+MARKDOWN_DIR="markdown"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Check if URL file is provided
+if [ $# -eq 0 ]; then
+    echo -e "${RED}Error: No URL file provided${NC}"
+    echo "Usage: $0 <url_file>"
+    echo "Example: $0 urls.txt"
+    exit 1
+fi
+
+URL_FILE="$1"
+
+# Check if file exists
+if [ ! -f "$URL_FILE" ]; then
+    echo -e "${RED}Error: File '$URL_FILE' not found${NC}"
+    exit 1
+fi
+
+# Check if yt-dlp is installed
+if ! command -v yt-dlp &> /dev/null; then
+    echo -e "${RED}Error: yt-dlp is not installed${NC}"
+    echo "Install it with: pip install yt-dlp"
+    exit 1
+fi
+
+# Create output directories
+mkdir -p "$OUTPUT_DIR"
+mkdir -p "$MARKDOWN_DIR"
+
+echo -e "${GREEN}Starting subtitle download...${NC}"
+echo "Language: $SUBTITLE_LANG"
+echo "Output directory: $OUTPUT_DIR"
+echo ""
+
+# Function to convert SRT to markdown
+convert_srt_to_markdown() {
+    local srt_file="$1"
+    local md_file="$2"
+    local video_title="$3"
+    local video_url="$4"
+    
+    # Start with title and metadata
+    echo "# $video_title" > "$md_file"
+    echo "" >> "$md_file"
+    echo "**Source:** $video_url" >> "$md_file"
+    echo "" >> "$md_file"
+    echo "---" >> "$md_file"
+    echo "" >> "$md_file"
+    
+    # Extract and append subtitle text
+    grep -v "^[0-9]*$" "$srt_file" | \
+    grep -v "^$" | \
+    grep -v " --> " >> "$md_file"
+}
+
+# Counter for statistics
+total=0
+success=0
+failed=0
+
+# Read URLs from file
+while IFS= read -r url || [ -n "$url" ]; do
+    # Skip empty lines and comments
+    [[ -z "$url" || "$url" =~ ^[[:space:]]*# ]] && continue
+    
+    ((total++))
+    echo -e "${YELLOW}[$total] Processing: $url${NC}"
+    
+    # Get video title first
+    video_title=$(yt-dlp --get-filename -o "%(title)s" "$url" 2>/dev/null || echo "Unknown Title")
+    
+    # Download subtitles
+    if yt-dlp --write-auto-subs \
+              --sub-langs "$SUBTITLE_LANG" \
+              --sub-format "srt" \
+              --skip-download \
+              --output "$OUTPUT_DIR/%(title)s.%(ext)s" \
+              "$url" 2>&1 | grep -v "has already been downloaded"; then
+        
+        # Find the downloaded SRT file
+        srt_file="$OUTPUT_DIR/${video_title}.${SUBTITLE_LANG}.srt"
+        
+        # Sometimes the file might not have language code
+        if [ ! -f "$srt_file" ]; then
+            srt_file="$OUTPUT_DIR/${video_title}.srt"
+        fi
+        
+        if [ -f "$srt_file" ]; then
+            md_file="$MARKDOWN_DIR/${video_title}.md"
+            echo "  Converting to markdown..."
+            
+            # Use Python version for better handling (recommended)
+            convert_srt_to_markdown "$srt_file" "$md_file" "$video_title" "$url"
+            
+            # Or use bash version (uncomment below and comment above if you prefer)
+            # convert_srt_to_markdown "$srt_file" "$md_file" "$video_title" "$url"
+            
+            echo -e "  ${GREEN}✓ Success${NC}"
+            echo "  SRT: $srt_file"
+            echo "  MD:  $md_file"
+            ((success++))
+        else
+            echo -e "  ${RED}✗ SRT file not found${NC}"
+            ((failed++))
+        fi
+    else
+        echo -e "  ${RED}✗ Download failed${NC}"
+        ((failed++))
+    fi
+    
+    echo ""
+done < "$URL_FILE"
+
+# Summary
+echo "================================"
+echo -e "${GREEN}Download Complete!${NC}"
+echo "Total URLs: $total"
+echo "Successful: $success"
+echo "Failed: $failed"
+echo ""
+echo "SRT files saved in: $OUTPUT_DIR/"
+echo "Markdown files saved in: $MARKDOWN_DIR/"
