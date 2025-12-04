@@ -15,6 +15,13 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "context_servers": {
+    "mcp-server-github": {
+      "source": "extension",
+      "enabled": true,
+      "settings": {}
+    }
+  },
   "excerpt_context_lines": 8,
   "agent_servers": {
     "claude": {
@@ -46,8 +53,8 @@
     "always_allow_tool_actions": true,
     "play_sound_when_agent_done": true,
     "default_model": {
-      "provider": "zed.dev",
-      "model": "claude-sonnet-4"
+      "provider": "ollama",
+      "model": "gemma3:4b"
     }
   },
   "base_keymap": "VSCode",
@@ -95,5 +102,5 @@
   "explorer.position": "right",
   "default_dock_anchor": "right",
   "dock": "right",
-  "relative_line_numbers": true
+  "relative_line_numbers": "enabled"
 }
