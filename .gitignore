@@ -3,3 +3,4 @@ Brewfile.lock.json
 github-copilot/*
 1Password/*
 google*
+.copilot
