@@ -11,5 +11,44 @@
     "show_command": false,
     "allow_concurrent_runs": true,
     "use_new_terminal": true
+  },
+  {
+    "label": "Claude Code",
+    "command": "claude",
+    "shell": {
+      "program": "sh"
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "show_summary": false,
+    "show_command": false,
+    "allow_concurrent_runs": true,
+    "use_new_terminal": true
+  },
+  {
+    "label": "Run File Test",
+    "command": "$ZED_WORKTREE_ROOT/scripts/run_test.sh -n 1 -cf $ZED_RELATIVE_DIR",
+    "shell": {
+      "program": "sh"
+    },
+    "hide": "never",
+    "reveal_target": "center",
+    "show_summary": true,
+    "show_command": true,
+    "allow_concurrent_runs": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Eval",
+    "command": "cd $ZED_WORKTREE_ROOT && npm run evals $ZED_RELATIVE_FILE",
+    "shell": {
+      "program": "sh"
+    },
+    "hide": "never",
+    "reveal_target": "center",
+    "show_summary": true,
+    "show_command": true,
+    "allow_concurrent_runs": true,
+    "use_new_terminal": false
   }
 ]
