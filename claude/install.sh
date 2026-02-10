@@ -38,6 +38,25 @@ if [ -d "$DOTFILES_CLAUDE/commands" ]; then
   done
 fi
 
+# Symlink skill directories
+if [ -d "$DOTFILES_CLAUDE/skills" ]; then
+  mkdir -p "$CLAUDE_DIR/skills"
+  for skill_dir in "$DOTFILES_CLAUDE/skills"/*/; do
+    if [ -d "$skill_dir" ]; then
+      skill_name=$(basename "$skill_dir")
+      target="$CLAUDE_DIR/skills/$skill_name"
+
+      # Remove existing file/symlink/directory
+      if [ -e "$target" ] || [ -L "$target" ]; then
+        rm -rf "$target"
+      fi
+
+      ln -s "$skill_dir" "$target"
+      echo "  Linked skill: $skill_name"
+    fi
+  done
+fi
+
 # If settings.json doesn't exist, copy the template
 if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
   cp "$DOTFILES_CLAUDE/settings.json.example" "$CLAUDE_DIR/settings.json"
