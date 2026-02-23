@@ -16,6 +16,7 @@
 // from the command palette or from `Zed` application menu.
 {
   "edit_predictions": {
+    "provider": "copilot",
     "mode": "eager",
   },
   "debugger": {
@@ -50,9 +51,6 @@
     "tree_view": true,
     "dock": "right",
   },
-  "features": {
-    "edit_prediction_provider": "copilot",
-  },
   "outline_panel": {
     "dock": "right",
   },
@@ -73,12 +71,14 @@
     "show_diagnostics": "errors",
   },
   "agent": {
+    "tool_permissions": {
+      "default": "allow"
+    },
     "use_modifier_to_send": true,
     "inline_assistant_model": {
       "provider": "copilot_chat",
       "model": "claude-sonnet-4",
     },
-    "always_allow_tool_actions": true,
     "play_sound_when_agent_done": true,
     "default_model": {
       "provider": "ollama",
