@@ -1,77 +1,34 @@
-# shortcut to this dotfiles path is $ZSH
-export ZSH=$HOME/.dotfiles
+# .zshenv already set $ZSH and loaded every path.zsh + env.zsh across topics.
+# This file is for *interactive* shell setup only: aliases, prompt, keybinds,
+# completions, tool shell integrations.
 
-# your project folder that we can `c [tab]` to
-export PROJECTS=~/Documents/Projects
+# Machine-local interactive overrides (git-ignored).
+[[ -f ~/.localrc ]] && source ~/.localrc
 
-# Stash your environment variables in ~/.localrc. This means they'll stay out
-# of your main dotfiles repository (which may be public, like this one), but
-# you'll have access to them in your scripts.
-if [[ -a ~/.localrc ]]
-then
-  source ~/.localrc
-fi
-
-# all of our zsh files
+# Collect every .zsh file across topic folders.
 typeset -U config_files
 config_files=($ZSH/**/*.zsh)
 
-# load the path files
-for file in ${(M)config_files:#*/path.zsh}
-do
+# Skip path.zsh + env.zsh (already sourced in .zshenv) and completion.zsh
+# (loaded after compinit below).
+for file in ${${${config_files:#*/path.zsh}:#*/env.zsh}:#*/completion.zsh}; do
   source $file
 done
 
-# load everything but the path and completion files
-for file in ${${config_files:#*/path.zsh}:#*/completion.zsh}
-do
-  source $file
-done
+# Initialize autocomplete before sourcing completion scripts.
+autoload -U compinit && compinit
 
-# initialize autocomplete here, otherwise functions won't be loaded
-autoload -U compinit
-compinit
-
-# load every completion after autocomplete loads
-for file in ${(M)config_files:#*/completion.zsh}
-do
+for file in ${(M)config_files:#*/completion.zsh}; do
   source $file
 done
 
 unset config_files
 
-# Better history
-# Credits to https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
+# Better history search with arrow keys.
+# https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-nvm use default
-
-alias tmux='tmux -f "$HOME/.dotfiles/tmux/tmux.conf"'
-alias awsp="source _awsp"
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
-
-export AWS_PROFILE=Dev-main-full-admins-REDACTED
-
-# bun completions
-[ -s "/Users/asierzapata/.bun/_bun" ] && source "/Users/asierzapata/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
-
-if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
-
-export EDITOR="zed --wait"
-export VISUAL="zed --wait"

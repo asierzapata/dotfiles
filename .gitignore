@@ -6,3 +6,4 @@ google*
 .copilot
 configstore
 .wrangler
+.claude/settings.local.json
