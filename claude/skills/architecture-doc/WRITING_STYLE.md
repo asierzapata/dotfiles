@@ -6,20 +6,20 @@ The goal of this documentation is to **teach** and, when needed, **convince**. N
 
 ## Core Principles
 
-- **Clear thinking becomes clear writing** — one can't exist without the other. Before writing a section, ask: what am I trying to say?
-- **Strip every sentence to its cleanest components** — clutter is the disease of writing. Cut unnecessary words, pompous frills, and meaningless jargon
-- **Never say anything in writing you wouldn't say in conversation** — if you don't say "indeed" or "moreover" out loud, don't write it
-- **Problem before solution** — always explain the current state and the pain before proposing anything. The reader needs to understand why before they care about what
-- **Be honest about uncertainty** — mark undecided things as open questions, use "TBW" for sections to be written later, say "pending to decide" when things are undecided. Don't pretend everything is figured out
+- **Clear thinking becomes clear writing** one can't exist without the other. Before writing a section, ask: what am I trying to say?
+- **Strip every sentence to its cleanest components** clutter is the disease of writing. Cut unnecessary words, pompous frills, and meaningless jargon
+- **Never say anything in writing you wouldn't say in conversation** if you don't say "indeed" or "moreover" out loud, don't write it
+- **Problem before solution** always explain the current state and the pain before proposing anything. The reader needs to understand why before they care about what
+- **Be honest about uncertainty** mark undecided things as open questions, use "TBW" for sections to be written later, say "pending to decide" when things are undecided. Don't pretend everything is figured out
 
 ## Voice and Tone
 
-- **Use "we" throughout** — write as if talking to a colleague. "We will add", "We currently have", "Our proposed solution"
-- **Conversational but professional** — approachable, not casual. The reader should feel like they're being walked through something by someone who knows it well, not reading a spec document
-- **Teacher-like** — explain concepts by building up from fundamentals. Explain the "why" before the "how"
-- **Direct** — "The problem with this approach is..." not "It could be argued that one potential concern might be..."
-- **Humble when appropriate** — acknowledge limitations, trade-offs, and things you don't know yet. This builds trust
-- **Convicted when recommending** — when proposing a solution, be clear about why you believe it's the right one. Label recommendations explicitly (e.g., "Option A: ... (Recommended)")
+- **Use "we" throughout** write as if talking to a colleague. "We will add", "We currently have", "Our proposed solution"
+- **Conversational but professional** approachable, not casual. The reader should feel like they're being walked through something by someone who knows it well, not reading a spec document
+- **Teacher-like** explain concepts by building up from fundamentals. Explain the "why" before the "how"
+- **Direct** "The problem with this approach is..." not "It could be argued that one potential concern might be..."
+- **Humble when appropriate** acknowledge limitations, trade-offs, and things you don't know yet. This builds trust
+- **Convicted when recommending** when proposing a solution, be clear about why you believe it's the right one. Label recommendations explicitly (e.g., "Option A: ... (Recommended)")
 
 ## Structure
 
@@ -42,28 +42,28 @@ The goal of this documentation is to **teach** and, when needed, **convince**. N
 - **Checklists** (`- [ ]`) for implementation plans listing what needs to be built
 - **Bold for key terms** when first introducing them: "The **WorkflowJournal** holds the source of truth"
 - **Code blocks with language hints** for types, code examples, and file structures
-- **Dashes for asides** — use them to add clarification without breaking the sentence flow
-- **Mix sentence lengths** — short punchy sentences for key points, longer ones for explanations. Don't let either dominate
+- **Don't use Dashes for asides, use normal comas or other punctuation** use them to add clarification without breaking the sentence flow
+- **Mix sentence lengths** short punchy sentences for key points, longer ones for explanations. Don't let either dominate
 
 ## Content
 
-- **Contextualize in the codebase** — relate abstract concepts to concrete things. "This is similar to how the video output module is architected"
-- **Explain the "why" behind decisions** — don't just state what was chosen, explain why alternatives were rejected
-- **List open questions explicitly** — use a dedicated "Open Questions" section with numbered items
-- **Cross-reference** — link to related RFCs, PRs, code files, and other documentation
-- **Acknowledge edge cases** — discuss known limitations and edge cases openly rather than hiding them
-- **State what is deferred** — if something is intentionally left for later, say so in a "Future Improvements" section
-- **Use analogies sparingly** — when a concept maps well to something the reader already knows, use it. Don't force it
+- **Contextualize in the codebase** relate abstract concepts to concrete things. "This is similar to how the video output module is architected"
+- **Explain the "why" behind decisions** don't just state what was chosen, explain why alternatives were rejected
+- **List open questions explicitly** use a dedicated "Open Questions" section with numbered items
+- **Cross-reference** link to related RFCs, PRs, code files, and other documentation
+- **Acknowledge edge cases** discuss known limitations and edge cases openly rather than hiding them
+- **State what is deferred** if something is intentionally left for later, say so in a "Future Improvements" section
+- **Use analogies sparingly** when a concept maps well to something the reader already knows, use it. Don't force it
 
 ## Avoid
 
 - Generic descriptions disconnected from the codebase
 - Hiding uncertainty behind confident-sounding language
-- Over-formalizing — this is internal documentation for engineers, not a specification for an external audience
-- Duplicating content from other docs — link to them instead
-- Passive voice — prefer active. "We implemented X" not "X was implemented"
+- Over-formalizing. This is internal documentation for engineers, not a specification for an external audience
+- Duplicating content from other docs, link to them instead
+- Passive voice. Prefer active. "We implemented X" not "X was implemented"
 - Unnecessary organizational comments or headers that don't add information
 - Conclusions that just repeat what was already said
-- Pompous phrases hiding painful truths — call problems what they are
-- Jargon without explanation — if a term isn't obvious, explain it on first use
-- Long unbroken paragraphs — break them up
+- Pompous phrases hiding painful truths, call problems what they are
+- Jargon without explanation, if a term isn't obvious, explain it on first use
+- Long unbroken paragraphs, break them up
