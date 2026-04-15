@@ -15,6 +15,25 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "ssh_connections": [
+    {
+      "host": "192.168.1.91",
+      "username": "asierzapata",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/Users/asierzapata/Documents/Projects/folio/./"
+          ]
+        },
+        {
+          "paths": [
+            "/Users/asierzapata/Documents/Projects/saku/./"
+          ]
+        }
+      ]
+    }
+  ],
   "edit_predictions": {
     "provider": "copilot",
     "mode": "eager",
@@ -23,6 +42,9 @@
     "dock": "right",
   },
   "terminal": {
+    "toolbar": {
+      "breadcrumbs": false
+    },
     "dock": "right",
   },
   "bottom_dock_layout": "contained",
@@ -40,10 +62,14 @@
     "line_endings_button": false,
   },
   "agent_servers": {
-    "claude": {
-      "default_model": "us.anthropic.claude-opus-4-6-v1",
+    "claude-acp": {
+      "type": "registry",
       "default_mode": "plan",
-    },
+      "default_model": "us.anthropic.claude-opus-4-6-v1",
+      "default_config_options": {
+        "model": "global.anthropic.claude-opus-4-6-v1"
+      }
+    }
   },
   "auto_signature_help": false,
   "show_signature_help_after_edits": true,
