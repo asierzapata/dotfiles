@@ -4,3 +4,5 @@ github-copilot/*
 1Password/*
 google*
 .copilot
+configstore
+.wrangler
