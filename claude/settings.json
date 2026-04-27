@@ -11,19 +11,6 @@
       "Bash(ls:*)"
     ]
   },
-  "hooks": {
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "afplay -v 8 /System/Library/Sounds/Glass.aiff"
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "npx ccusage statusline",
@@ -34,5 +21,6 @@
     "figma@claude-plugins-official": true
   },
   "effortLevel": "medium",
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "model": "opus"
 }
