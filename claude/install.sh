@@ -20,6 +20,15 @@ chmod +x "$DOTFILES_CLAUDE/statusline.sh"
 
 echo "  Linked statusline.sh"
 
+# Symlink the shared writing-style reference
+if [ -f "$DOTFILES_CLAUDE/writing-style.md" ]; then
+  if [ -e "$CLAUDE_DIR/writing-style.md" ] || [ -L "$CLAUDE_DIR/writing-style.md" ]; then
+    rm "$CLAUDE_DIR/writing-style.md"
+  fi
+  ln -s "$DOTFILES_CLAUDE/writing-style.md" "$CLAUDE_DIR/writing-style.md"
+  echo "  Linked writing-style.md"
+fi
+
 # Symlink command files
 if [ -d "$DOTFILES_CLAUDE/commands" ]; then
   for cmd_file in "$DOTFILES_CLAUDE/commands"/*.md; do

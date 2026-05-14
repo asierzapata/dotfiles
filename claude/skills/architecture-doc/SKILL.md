@@ -26,7 +26,7 @@ Helps create architectural documentation following a consistent writing style an
 
 ## Writing Style
 
-**Always read [WRITING_STYLE.md](./WRITING_STYLE.md) before writing.** It contains the full set of rules for voice, tone, structure, formatting, and content.
+**Always read [writing-style.md](~/.claude/writing-style.md) before writing.** It contains the full set of rules for voice, tone, structure, formatting, and content.
 
 The key points:
 
@@ -66,7 +66,7 @@ Ask the user where the document should live. Common patterns:
 
 ### Step 4: Write the Document
 
-Follow the writing style from [WRITING_STYLE.md](./WRITING_STYLE.md) and use the structure template for the chosen document type below.
+Follow the writing style from [writing-style.md](~/.claude/writing-style.md) and use the structure template for the chosen document type below.
 
 ### Step 5: Update Indexes
 

@@ -22,5 +22,5 @@
   },
   "effortLevel": "medium",
   "voiceEnabled": true,
-  "model": "opus"
+  "editorMode": "vim"
 }
