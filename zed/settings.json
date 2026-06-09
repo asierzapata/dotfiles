@@ -32,7 +32,17 @@
       ],
     },
   ],
+  "show_edit_predictions": true,
+  "feature_flags": {
+    "edit_prediction_jumps": "on",
+    "agent-thread-worktree-label": "both",
+  },
   "edit_predictions": {
+    "allow_data_collection": "no",
+    "ollama": {
+      "prompt_format": "qwen",
+      "model": "qwen2.5-coder:7b-base",
+    },
     "provider": "copilot",
     "mode": "eager",
   },
@@ -150,6 +160,9 @@
   "autosave": "on_focus_change",
   "format_on_save": "on",
   "languages": {
+    "Markdown": {
+      "show_edit_predictions": false
+    },
     "JavaScript": {
       "code_actions_on_format": {
         "source.fixAll.eslint": true,
