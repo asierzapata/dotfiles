@@ -64,4 +64,58 @@
     "allow_concurrent_runs": true,
     "use_new_terminal": false,
   },
+  {
+    "label": "PR: checkout",
+    "command": "git pr-checkout",
+    "shell": {
+      "program": "sh",
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "use_new_terminal": false,
+  },
+  {
+    "label": "PR: view diff",
+    "command": "gh pr diff $ZED_RELATIVE_FILE --color always | less -R",
+  },
+  {
+    "label": "PR: comment on current line",
+    "command": "git pr-comment \"$ZED_RELATIVE_FILE\" $ZED_ROW",
+    "shell": {
+      "program": "sh",
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "use_new_terminal": false,
+  },
+  {
+    "label": "PR: request changes",
+    "command": "printf 'Review body > '; read -r body; gh pr review --request-changes --body \"$body\"",
+    "shell": {
+      "program": "sh",
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "use_new_terminal": false,
+  },
+  {
+    "label": "PR: approve",
+    "command": "printf 'Review body > '; read -r body; gh pr review --approve --body \"$body\"",
+    "shell": {
+      "program": "sh",
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "use_new_terminal": false,
+  },
+  {
+    "label": "PR: general comment review",
+    "command": "printf 'Review body > '; read -r body; gh pr review --comment --body \"$body\"",
+    "shell": {
+      "program": "sh",
+    },
+    "hide": "on_success",
+    "reveal_target": "center",
+    "use_new_terminal": false,
+  },
 ]
