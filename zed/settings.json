@@ -56,6 +56,9 @@
       "breadcrumbs": false,
     },
     "dock": "right",
+    "env": {
+      "npm_config_prefix": "",
+    },
   },
   "bottom_dock_layout": "contained",
   "context_servers": {
