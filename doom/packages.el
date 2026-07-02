@@ -9,6 +9,23 @@
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
+;; Switch themes automatically to follow the macOS system appearance
+;; (light/dark). On emacs-plus this hooks into `ns-system-appearance' for
+;; instant, poll-free switching.
+(package! auto-dark)
+
+;; GitHub Copilot inline (ghost-text) completions, like Zed edit predictions.
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
+
+;; Native agent chat buffer powered by ACP (Agent Client Protocol) -- the same
+;; protocol Zed's agent panel uses. `acp' + `shell-maker' are pulled in as deps.
+(package! acp
+  :recipe (:host github :repo "xenodium/acp.el"))
+(package! shell-maker)
+(package! agent-shell
+  :recipe (:host github :repo "xenodium/agent-shell"))
+
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/radian-software/straight.el#the-recipe-format

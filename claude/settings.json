@@ -21,6 +21,7 @@
     "figma@claude-plugins-official": true
   },
   "effortLevel": "medium",
+  "editorMode": "vim",
   "voiceEnabled": true,
-  "editorMode": "vim"
+  "tui": "fullscreen"
 }

@@ -6,6 +6,7 @@ ln -s "$HOME/.dotfiles/doom/init.el" "$HOME/.config/doom/init.el"
 ln -s "$HOME/.dotfiles/doom/config.el" "$HOME/.config/doom/config.el"
 ln -s "$HOME/.dotfiles/doom/packages.el" "$HOME/.config/doom/packages.el"
 ln -s "$HOME/.dotfiles/doom/snippets" "$HOME/.config/doom/snippets"
+ln -s "$HOME/.dotfiles/doom/themes" "$HOME/.config/doom/themes"
 
 # Bootstrap Doom Emacs itself if it isn't already installed.
 # We install to ~/.emacs.d (not ~/.config/emacs) because this setup exports

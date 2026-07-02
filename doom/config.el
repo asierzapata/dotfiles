@@ -23,19 +23,36 @@
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 ;;
+;; Monaspace (Neon), matching my Zed buffer font. The "Mono" nerd-font variant
+;; keeps glyphs monospaced; the "Propo" variant is used for prose/UI.
+(setq doom-font (font-spec :family "MonaspiceNe Nerd Font Mono" :size 18)
+      doom-variable-pitch-font (font-spec :family "MonaspiceNe Nerd Font Propo" :size 18))
+;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+;; Make my custom themes in ./themes/ loadable (xy-zed lives there).
+(add-to-list 'custom-theme-load-path (expand-file-name "themes/" doom-user-dir))
+;; Trust my own themes so `load-theme'/auto-dark don't reject them via the
+;; `custom-safe-themes' prompt (Doom only auto-trusts its bundled themes).
+(setq custom-safe-themes t)
 
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+;; Themes follow the macOS system appearance, mirroring my Zed setup:
+;;   light -> doom-one-light  (Zed's "One Light")
+;;   dark  -> xy-zed          (my port of Zed's "XY-Zed")
+;; `doom-theme' is the fallback used before auto-dark kicks in.
+(setq doom-theme 'xy-zed)
+
+(use-package! auto-dark
+  :config
+  ;; `auto-dark-themes' is (DARK-THEMES LIGHT-THEMES); first of each wins.
+  (setq auto-dark-themes '((xy-zed) (doom-one-light)))
+  (auto-dark-mode 1))
+
+;; Relative line numbers, matching my Zed `relative_line_numbers: enabled`.
+(setq display-line-numbers-type 'relative)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -73,3 +90,76 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
+
+
+;;
+;; Editor behaviour mirrored from my Zed config
+;;
+
+;; `autosave: "on_focus_change"' in Zed -> save file-visiting buffers on idle
+;; and whenever focus leaves the current buffer.
+(defun +my/save-buffer-if-file ()
+  "Save the current buffer if it is visiting a real file and is modified."
+  (when (and buffer-file-name (buffer-modified-p))
+    (save-buffer)))
+(setq auto-save-visited-interval 1)
+(auto-save-visited-mode +1)
+(add-hook 'doom-switch-buffer-hook #'+my/save-buffer-if-file)
+
+;; `source.fixAll.eslint' on save in Zed -> apply ESLint autofixes before the
+;; prettier/rustfmt formatter (`format +onsave') runs. Needs the ESLint LSP
+;; server, which lsp-mode fetches automatically on first use.
+(after! lsp-mode
+  (defun +my/eslint-fix-on-save-h ()
+    (when (bound-and-true-p lsp-mode)
+      (add-hook 'before-save-hook #'lsp-eslint-fix-all -10 t)))
+  (dolist (hook '(js-mode-hook
+                  js2-mode-hook
+                  typescript-mode-hook
+                  typescript-tsx-mode-hook
+                  tsx-ts-mode-hook
+                  typescript-ts-mode-hook
+                  web-mode-hook
+                  rjsx-mode-hook))
+    (add-hook hook #'+my/eslint-fix-on-save-h)))
+
+
+;;
+;; AI: Copilot inline predictions + ACP agent chat
+;;
+
+;; GitHub Copilot ghost-text completions in code buffers (Zed edit predictions).
+;; First run: `M-x copilot-install-server' then `M-x copilot-login'.
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+         ("<tab>"   . copilot-accept-completion)
+         ("TAB"     . copilot-accept-completion)
+         ("C-TAB"   . copilot-accept-completion-by-word)
+         ("C-<tab>" . copilot-accept-completion-by-word)
+         ("C-e"     . copilot-accept-completion)
+         ("M-]"     . copilot-next-completion)
+         ("M-["     . copilot-previous-completion))
+  :config
+  ;; Silence noise when a line is over the model's width limit.
+  (add-to-list 'copilot-indentation-alist '(prog-mode 2)))
+
+;; Accept a Copilot suggestion with TAB in evil insert state too.
+(after! copilot
+  (map! :map copilot-completion-map
+        :i "<tab>" #'copilot-accept-completion
+        :i "TAB"   #'copilot-accept-completion))
+
+;; Native ACP agent chat buffer -- Claude Code backend.
+;; Start a session with `M-x agent-shell-anthropic-start-claude-code'.
+;; Uses your Claude login (Pro/Max/Team); needs the `claude-agent-acp' CLI.
+(use-package! agent-shell
+  :defer t
+  :init
+  (map! :leader
+        (:prefix ("l" . "llm/agent")
+         :desc "Claude Code (ACP)" "c" #'agent-shell-anthropic-start-claude-code
+         :desc "Pick agent"        "a" #'agent-shell))
+  :config
+  (setq agent-shell-anthropic-authentication
+        (agent-shell-anthropic-make-authentication :login t)))
