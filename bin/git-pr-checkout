@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# Pick an open PR with fzf and check it out locally.
+#
+# Usage: git pr-checkout [fzf query]
+#
+# The preview pane shows the PR body and diffstat. Any argument is used as the
+# initial fzf query so you can pre-filter, e.g. `git pr-checkout sales`.
+
+pr=$(gh pr list --limit 1000 \
+      --json number,title,author,headRefName \
+      --template '{{range .}}{{printf "%v\t%s\t%s\t%s\n" .number .title .author.login .headRefName}}{{end}}' \
+  | fzf --with-nth=1,2,3 \
+        --delimiter='\t' \
+        --query="$1" \
+        --prompt='PR > ' \
+        --preview='gh pr view {1} --json title,body,additions,deletions,files --template "{{.title}}\n\n+{{.additions}} -{{.deletions}}\n\n{{.body}}"' \
+        --preview-window='right,60%,wrap' \
+  | cut -f1)
+
+[ -z "$pr" ] && exit 0
+
+gh pr checkout "$pr"

@@ -1,6 +1,8 @@
-# shortcut to this dotfiles path is $ZSH
-export ZSH=$HOME/.dotfiles
+# .zshenv already set $ZSH and loaded every path.zsh + env.zsh across topics.
+# This file is for *interactive* shell setup only: aliases, prompt, keybinds,
+# completions, tool shell integrations.
 
+<<<<<<< HEAD
 # your project folder that we can `c [tab]` to
 export PROJECTS=~/Documents/Projects
 
@@ -35,19 +37,44 @@ compinit
 # load every completion after autocomplete loads
 for file in ${(M)config_files:#*/completion.zsh}
 do
+=======
+# Machine-local interactive overrides (git-ignored).
+[[ -f ~/.localrc ]] && source ~/.localrc
+
+# Collect every .zsh file across topic folders.
+typeset -U config_files
+config_files=($ZSH/**/*.zsh)
+
+# Skip path.zsh + env.zsh (already sourced in .zshenv) and completion.zsh
+# (loaded after compinit below).
+for file in ${${${config_files:#*/path.zsh}:#*/env.zsh}:#*/completion.zsh}; do
+  source $file
+done
+
+# Initialize autocomplete before sourcing completion scripts.
+autoload -U compinit && compinit
+
+for file in ${(M)config_files:#*/completion.zsh}; do
+>>>>>>> 81e1c18e7b703032e40fe018fae53e23283dfd10
   source $file
 done
 
 unset config_files
 
+<<<<<<< HEAD
 # Better history
 # Credits to https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
+=======
+# Better history search with arrow keys.
+# https://coderwall.com/p/jpj_6q/zsh-better-history-searching-with-arrow-keys
+>>>>>>> 81e1c18e7b703032e40fe018fae53e23283dfd10
 autoload -U up-line-or-beginning-search
 autoload -U down-line-or-beginning-search
 zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
+<<<<<<< HEAD
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -75,3 +102,5 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 
 export EDITOR="zed --wait"
 export VISUAL="zed --wait"
+=======
+>>>>>>> 81e1c18e7b703032e40fe018fae53e23283dfd10

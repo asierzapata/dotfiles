@@ -1,0 +1,25 @@
+# $ZSH points at the dotfiles root so every topic file can find its siblings.
+export ZSH=$HOME/.dotfiles
+
+# Machine-local env vars (git-ignored). Declared before topic files so topics
+# can read values like $AWS_PROFILE or secrets.
+[[ -f ~/.localrc.env ]] && source ~/.localrc.env
+
+# Collect every path.zsh and env.zsh across topic folders. These are the only
+# files sourced for all shells (interactive, non-interactive, scripts, cron).
+typeset -U env_files
+env_files=($ZSH/**/path.zsh(N) $ZSH/**/env.zsh(N))
+
+# path.zsh is sourced first so $PATH is set before any env.zsh reads commands.
+for file in ${(M)env_files:#*/path.zsh}; do
+  source $file
+done
+
+for file in ${(M)env_files:#*/env.zsh}; do
+  source $file
+done
+
+unset env_files
+
+# Cargo env (managed by rustup installer).
+[[ -f ~/.cargo/env ]] && source ~/.cargo/env
