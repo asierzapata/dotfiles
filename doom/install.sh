@@ -1,3 +1,10 @@
+# If emacs-plus was compiled against an older tree-sitter dylib (e.g. 0.25.x),
+# a tree-sitter major-version bump breaks the binary. Reinstall to relink.
+if ! emacs --batch --eval '(message "ok")' &>/dev/null 2>&1; then
+  echo "Emacs failed to start — reinstalling emacs-plus to relink against current tree-sitter..."
+  brew reinstall d12frosted/emacs-plus/emacs-plus@29
+fi
+
 mkdir -p "$HOME/.config/doom"
 
 rm -rf $HOME/.config/doom/*
