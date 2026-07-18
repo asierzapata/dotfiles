@@ -23,7 +23,8 @@
     "dock": "right",
   },
   "terminal": {
-    "dock": "right",
+    "font_family": "MonaspiceNe Nerd Font Mono",
+    "dock": "bottom",
   },
   "bottom_dock_layout": "contained",
   "context_servers": {
