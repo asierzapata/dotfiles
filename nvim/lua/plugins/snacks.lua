@@ -370,6 +370,27 @@ return {
 				desc = "Goto T[y]pe Definition",
 			},
 			{
+				"gA",
+				function()
+					Snacks.picker.lsp_references()
+				end,
+				desc = "Find All References",
+			},
+			{
+				"gs",
+				function()
+					Snacks.picker.lsp_symbols()
+				end,
+				desc = "Document Symbols",
+			},
+			{
+				"gS",
+				function()
+					Snacks.picker.lsp_workspace_symbols()
+				end,
+				desc = "Workspace Symbols",
+			},
+			{
 				"<leader>ss",
 				function()
 					Snacks.picker.lsp_symbols()

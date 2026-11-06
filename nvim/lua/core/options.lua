@@ -32,3 +32,21 @@ opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 -- split windows
 opt.splitright = true -- split vertical windwos to the right
 opt.splitbelow = true -- split horizontal window to the bottom
+
+-- Save on focus change, like Zed's "autosave": "on_focus_change".
+opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "WinLeave" }, {
+	group = vim.api.nvim_create_augroup("AutosaveOnFocusChange", { clear = true }),
+	callback = function(ev)
+		local bo = vim.bo[ev.buf]
+		if bo.modified and bo.buftype == "" and bo.modifiable and not bo.readonly and vim.api.nvim_buf_get_name(ev.buf) ~= "" then
+			vim.api.nvim_buf_call(ev.buf, function()
+				vim.cmd("silent! update")
+			end)
+		end
+	end,
+})
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
+	group = vim.api.nvim_create_augroup("ReloadOnFocus", { clear = true }),
+	command = "silent! checktime",
+})

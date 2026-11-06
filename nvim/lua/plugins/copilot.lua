@@ -28,15 +28,14 @@ return {
 		event = "InsertEnter",
 		config = function()
 			require("copilot").setup({
-				suggestion = { enabled = false },
+				-- Inline ghost-text predictions accepted with <Tab>, like Zed's edit predictions.
+				suggestion = {
+					enabled = true,
+					auto_trigger = true,
+					keymap = { accept = "<Tab>", next = "<M-]>", prev = "<M-[>", dismiss = "<C-]>" },
+				},
 				panel = { enabled = false },
 			})
-		end,
-	},
-	{
-		"zbirenbaum/copilot-cmp",
-		config = function()
-			require("copilot_cmp").setup()
 		end,
 	},
 	{

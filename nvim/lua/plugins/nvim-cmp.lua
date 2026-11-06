@@ -45,7 +45,6 @@ return {
 			}),
 			-- sources for autocompletion
 			sources = cmp.config.sources({
-				{ name = "copilot" }, -- github copilot
 				{ name = "nvim_lsp" }, -- language server protocol
 				{ name = "luasnip" }, -- snippets
 				{ name = "buffer" }, -- text within current buffer
