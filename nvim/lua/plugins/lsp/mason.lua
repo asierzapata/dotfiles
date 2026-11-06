@@ -40,6 +40,8 @@ return {
 				"gopls",
 				"rust_analyzer",
 			},
+			-- stylua is installed for conform; started as a language server it exits immediately.
+			automatic_enable = { exclude = { "stylua" } },
 		})
 
 		mason_tool_installer.setup({
