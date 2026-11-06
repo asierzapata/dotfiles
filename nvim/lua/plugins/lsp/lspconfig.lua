@@ -61,6 +61,23 @@ return {
 		-- that nvim-lspconfig ships for each one.
 		vim.lsp.config("*", { capabilities = capabilities })
 
+		-- oxlint runs from each project's node_modules, so Mason does not install or enable it.
+		-- The default root is the nearest .oxlintrc.json, which can be a nested config without
+		-- node_modules (Edpuzzle-Web's src/frontend/web). Prefer the folder that has the binary.
+		local default_oxlint_root = vim.lsp.config.oxlint.root_dir
+		vim.lsp.config("oxlint", {
+			root_dir = function(bufnr, on_dir)
+				for dir in vim.fs.parents(vim.api.nvim_buf_get_name(bufnr)) do
+					local has_config = vim.uv.fs_stat(dir .. "/.oxlintrc.json") or vim.uv.fs_stat(dir .. "/.oxlintrc.jsonc")
+					if has_config and vim.fn.executable(dir .. "/node_modules/.bin/oxlint") == 1 then
+						return on_dir(dir)
+					end
+				end
+				default_oxlint_root(bufnr, on_dir)
+			end,
+		})
+		vim.lsp.enable("oxlint")
+
 		vim.lsp.config("svelte", {
 			on_attach = function(client)
 				vim.api.nvim_create_autocmd("BufWritePost", {
