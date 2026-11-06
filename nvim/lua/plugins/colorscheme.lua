@@ -1,35 +1,29 @@
+-- Follows the macOS appearance like Zed's "theme": { "mode": "system" }:
+-- XY-Zed (nvim/colors/xy-zed.lua) when dark, One Light when light.
 return {
 	{
-		"scottmckendry/cyberdream.nvim",
+		"navarasu/onedark.nvim",
 		lazy = false,
 		priority = 1000,
 		config = function()
-			require("cyberdream").setup({
-				-- Set light or dark variant
-				variant = "auto", -- use "light" for the light variant. Also accepts "auto" to set dark or light colors based on the current value of `vim.o.background`
-
-				-- Enable transparent background
-				transparent = true,
-
-				-- Reduce the overall saturation of colours for a more muted look
-				saturation = 1, -- accepts a value between 0 and 1. 0 will be fully desaturated (greyscale) and 1 will be the full color (default)
-
-				-- Enable italics comments
-				italic_comments = false,
-
-				-- Replace all fillchars with ' ' for the ultimate clean look
-				hide_fillchars = false,
-
-				-- Apply a modern borderless look to pickers like Telescope, Snacks Picker & Fzf-Lua
-				borderless_pickers = false,
-
-				-- Set terminal colors used in `:terminal`
-				terminal_colors = true,
-
-				-- Improve start up time by caching highlights. Generate cache with :CyberdreamBuildCache and clear with :CyberdreamClearCache
-				cache = false,
-			})
-			vim.cmd([[colorscheme cyberdream]])
+			require("onedark").setup({ style = "light" })
+			vim.cmd.colorscheme("xy-zed")
 		end,
+	},
+	{
+		"f-person/auto-dark-mode.nvim",
+		lazy = false,
+		priority = 999,
+		opts = {
+			update_interval = 3000,
+			set_dark_mode = function()
+				vim.cmd.colorscheme("xy-zed")
+			end,
+			set_light_mode = function()
+				vim.o.background = "light"
+				require("onedark").setup({ style = "light" })
+				vim.cmd.colorscheme("onedark")
+			end,
+		},
 	},
 }
