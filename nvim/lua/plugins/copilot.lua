@@ -28,11 +28,11 @@ return {
 		event = "InsertEnter",
 		config = function()
 			require("copilot").setup({
-				-- Inline ghost-text predictions accepted with <Tab>, like Zed's edit predictions.
+				-- Inline ghost-text predictions, like Zed's edit predictions. blink-cmp.lua maps <Tab> to accept.
 				suggestion = {
 					enabled = true,
 					auto_trigger = true,
-					keymap = { accept = "<Tab>", next = "<M-]>", prev = "<M-[>", dismiss = "<C-]>" },
+					keymap = { accept = false, next = "<M-]>", prev = "<M-[>", dismiss = "<C-]>" },
 				},
 				panel = { enabled = false },
 			})
