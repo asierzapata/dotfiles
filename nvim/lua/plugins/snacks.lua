@@ -9,6 +9,10 @@ return {
 					explorer = {
 						layout = { layout = { position = "right" } },
 					},
+					-- Docked on the right like Zed's git panel; the diff preview opens in the main window.
+					git_status = {
+						layout = { preset = "sidebar", layout = { position = "right" }, preview = "main" },
+					},
 				},
 			},
 			explorer = {},
