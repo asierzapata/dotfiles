@@ -57,6 +57,31 @@ if [ -d "$DOTFILES_CLAUDE/skills" ]; then
   done
 fi
 
+# Symlink global CLAUDE.md
+if [ -f "$DOTFILES_CLAUDE/CLAUDE.md" ]; then
+  if [ -e "$CLAUDE_DIR/CLAUDE.md" ] || [ -L "$CLAUDE_DIR/CLAUDE.md" ]; then
+    rm "$CLAUDE_DIR/CLAUDE.md"
+  fi
+  ln -s "$DOTFILES_CLAUDE/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
+  echo "  Linked CLAUDE.md"
+fi
+
+# Symlink hook scripts
+if [ -d "$DOTFILES_CLAUDE/hooks" ]; then
+  mkdir -p "$CLAUDE_DIR/hooks"
+  for hook_file in "$DOTFILES_CLAUDE/hooks"/*; do
+    if [ -f "$hook_file" ]; then
+      target="$CLAUDE_DIR/hooks/$(basename "$hook_file")"
+      if [ -e "$target" ] || [ -L "$target" ]; then
+        rm "$target"
+      fi
+      chmod +x "$hook_file"
+      ln -s "$hook_file" "$target"
+      echo "  Linked hook: $(basename "$hook_file")"
+    fi
+  done
+fi
+
 # If settings.json doesn't exist, copy the template
 if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
   cp "$DOTFILES_CLAUDE/settings.json.example" "$CLAUDE_DIR/settings.json"
@@ -65,4 +90,17 @@ if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
 else
   echo "  settings.json already exists (not modified)"
   echo "  → Ensure it has statusLine.command set to ~/.claude/statusline.sh"
+fi
+
+# Ensure the Rex long-running command hook is registered in settings.json
+REX_HOOK_CMD="~/.claude/hooks/rex-long-running.sh"
+if command -v jq >/dev/null 2>&1; then
+  if ! jq -e --arg c "$REX_HOOK_CMD" '[.hooks.PreToolUse[]?.hooks[]?.command] | index($c)' "$CLAUDE_DIR/settings.json" >/dev/null; then
+    tmp=$(mktemp)
+    jq --arg c "$REX_HOOK_CMD" '.hooks.PreToolUse = ((.hooks.PreToolUse // []) + [{"matcher":"Bash","hooks":[{"type":"command","command":$c,"timeout":5}]}])' \
+      "$CLAUDE_DIR/settings.json" > "$tmp" && mv "$tmp" "$CLAUDE_DIR/settings.json"
+    echo "  Registered rex-long-running hook in settings.json"
+  fi
+else
+  echo "  jq not found: add the rex-long-running PreToolUse hook to settings.json manually"
 fi
