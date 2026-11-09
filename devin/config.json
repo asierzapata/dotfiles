@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "devin": {
+    "org_id": "org-eb7a767337824ad8a5c1d1abaf3f7070"
+  },
+  "shell": {
+    "setup_complete": true
+  },
+  "theme_mode": "dark",
+  "agent": {
+    "model": "gpt-6-astra-medium",
+    "preferred_family_models": {
+      "gpt-6-astra": "gpt-6-astra-medium",
+      "fusion": "fusion-gpt-6-astra-high-sidekick-gpt-5-6-sol-high"
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Fetch(domain:asierzapata.com)"
+    ]
+  }
+}
