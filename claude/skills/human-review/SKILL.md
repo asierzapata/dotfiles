@@ -1,10 +1,10 @@
 ---
-name: review-in-hunk
-description: Open the current change in Hunk in a new Rex tab, then iterate on the comments Asier leaves inline in Hunk. Use when Asier runs /review-in-hunk, or asks to review a diff "in Hunk", "with comments", or "iterate on the diff together".
+name: human-review
+description: Let Asier review a change himself, visually, in Hunk. Opens the diff in a new Rex tab, then iterates with him on the inline comments he leaves there, answering, changing code, and leaving agent notes on the lines. Use when Asier runs /human-review, or wants to review, look at, or go through a change, branch, commit, or diff himself, "in Hunk", "visually", "with comments", or "together". Not for an automated review by an agent, which is review-change or code-review.
 argument-hint: "[uncommitted | <ref> | <from>..<to>] [-- <pathspec>]"
 ---
 
-# Review in Hunk
+# Human review in Hunk
 
 Asier reviews the diff in Hunk, a terminal diff viewer, and leaves inline comments there. Your job is to open the diff, read those comments, answer or act on each one in the same place, and keep the view current while you iterate. Hunk is his UI: never run `hunk diff` or `hunk show` in your own shell, only through Rex in a new tab. Control the open session with `hunk session *`.
 
@@ -59,6 +59,22 @@ hunk session comment add <session> --reply-to <note-id> --summary "<answer>" --a
 - A disagreement: if you think the request is wrong, say why in the reply and do not make the change until he confirms.
 
 Prefer one `hunk session comment apply <session> --stdin` batch when you have several replies ready. Never delete or edit his notes.
+
+### Leave your own notes
+
+Hunk shows agent notes by default, so you can also start a note on a line instead of only replying. Use one when something in the diff needs his attention: a change you made on a line he did not comment on, a risk you spotted, or a decision he should confirm. Anchor it to the line in the new version, or use `--old-line` for a deleted line:
+
+```sh
+hunk session comment add <session> --file <path> --new-line <n> --summary "<one-line point>" --rationale "<why, if it needs more>" --author Claude
+```
+
+For several notes, send one batch. Each item has `summary` and either `replyTo` alone, or `filePath` with one of `newLine`, `oldLine`, or `hunk`:
+
+```sh
+printf '%s\n' '{"comments":[{"filePath":"src/a.js","newLine":42,"summary":"...","rationale":"...","author":"Claude"}]}' | hunk session comment apply <session> --stdin
+```
+
+Keep the summary to one line and put the explanation in the rationale. Add `--focus` only when you want to move his view to the note. Do not repeat in a note what a reply already says.
 
 In the conversation, give a short summary: which comments you changed code for, which you only answered, and which wait for his decision. Do not repeat the replies.
 
