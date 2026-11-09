@@ -4,3 +4,4 @@ github-copilot/*
 1Password/*
 google*
 .copilot
+hunk/state.json
