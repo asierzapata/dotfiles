@@ -43,6 +43,8 @@ When he says he is done, list his notes:
 hunk session comment list <session> --type user --json
 ```
 
+Always pass `--type user`. Without it, the listing shows only agent notes, such as review-change findings and your own replies, and his notes are missing from it. An empty or agent-only result is not proof that he left no comments.
+
 Read the code around each note before answering, with `hunk session review <session> --include-patch --json` for the files involved, or by reading the files. Comments can be questions, change requests, or remarks. Treat them in file order, and group comments that ask for the same change.
 
 ## 4. Answer in Hunk
