@@ -38,24 +38,7 @@ if [ -d "$DOTFILES_CLAUDE/commands" ]; then
   done
 fi
 
-# Symlink skill directories
-if [ -d "$DOTFILES_CLAUDE/skills" ]; then
-  mkdir -p "$CLAUDE_DIR/skills"
-  for skill_dir in "$DOTFILES_CLAUDE/skills"/*/; do
-    if [ -d "$skill_dir" ]; then
-      skill_name=$(basename "$skill_dir")
-      target="$CLAUDE_DIR/skills/$skill_name"
-
-      # Remove existing file/symlink/directory
-      if [ -e "$target" ] || [ -L "$target" ]; then
-        rm -rf "$target"
-      fi
-
-      ln -s "$skill_dir" "$target"
-      echo "  Linked skill: $skill_name"
-    fi
-  done
-fi
+# Skills are linked by agents/install.sh, which shares them with every agent.
 
 # Symlink global CLAUDE.md
 if [ -f "$DOTFILES_CLAUDE/CLAUDE.md" ]; then

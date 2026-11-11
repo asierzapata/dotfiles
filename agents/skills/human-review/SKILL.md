@@ -49,10 +49,10 @@ Read the code around each note before answering, with `hunk session review <sess
 
 ## 4. Answer in Hunk
 
-Reply to every note in Hunk, so the conversation stays next to the code:
+Reply to every note in Hunk, so the conversation stays next to the code. Pass your own agent name as `--author`, such as Claude, Codex, Devin, or Antigravity:
 
 ```sh
-hunk session comment add <session> --reply-to <note-id> --summary "<answer>" --author Claude
+hunk session comment add <session> --reply-to <note-id> --summary "<answer>" --author <you>
 ```
 
 - A question: answer it in the reply. Keep it to a few sentences.
@@ -67,13 +67,13 @@ Prefer one `hunk session comment apply <session> --stdin` batch when you have se
 Hunk shows agent notes by default, so you can also start a note on a line instead of only replying. Use one when something in the diff needs his attention: a change you made on a line he did not comment on, a risk you spotted, or a decision he should confirm. Anchor it to the line in the new version, or use `--old-line` for a deleted line:
 
 ```sh
-hunk session comment add <session> --file <path> --new-line <n> --summary "<one-line point>" --rationale "<why, if it needs more>" --author Claude
+hunk session comment add <session> --file <path> --new-line <n> --summary "<one-line point>" --rationale "<why, if it needs more>" --author <you>
 ```
 
 For several notes, send one batch. Each item has `summary` and either `replyTo` alone, or `filePath` with one of `newLine`, `oldLine`, or `hunk`:
 
 ```sh
-printf '%s\n' '{"comments":[{"filePath":"src/a.js","newLine":42,"summary":"...","rationale":"...","author":"Claude"}]}' | hunk session comment apply <session> --stdin
+printf '%s\n' '{"comments":[{"filePath":"src/a.js","newLine":42,"summary":"...","rationale":"...","author":"<you>"}]}' | hunk session comment apply <session> --stdin
 ```
 
 Keep the summary to one line and put the explanation in the rationale. Add `--focus` only when you want to move his view to the note. Do not repeat in a note what a reply already says.

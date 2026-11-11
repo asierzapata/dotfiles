@@ -9,10 +9,10 @@ description: Show Asier a Mermaid diagram in a Rex pane beside the conversation 
 
 ## Show a diagram
 
-Write the Mermaid source to a file in your scratchpad, named after the topic, then show it:
+Write the Mermaid source to a file in a temporary directory (your scratchpad, if your tool gives you one), named after the topic, then show it:
 
 ```sh
-mermaid-view <scratchpad>/markers-flow.mmd --title "Markers flow"
+mermaid-view <tmp>/markers-flow.mmd --title "Markers flow"
 ```
 
 - The pane shows box-drawn Unicode text by default. When the diagram is wider than the pane, it switches to an image on its own.
@@ -24,7 +24,7 @@ mermaid-view <scratchpad>/markers-flow.mmd --title "Markers flow"
 
 Only these types are supported: `graph`/`flowchart` (TD, LR, BT, RL), `sequenceDiagram`, `stateDiagram-v2`, `classDiagram`, `erDiagram`, and `xychart-beta`. Gantt, pie, mindmap, and timeline fail with "Invalid mermaid header". Pick another type, or skip the diagram.
 
-The parser silently drops lines it cannot read, so a diagram can render with missing nodes or edges and no error. After each call, check what was drawn: in text mode, read the pane with `rex capture -s "$REX_SESSION" -b <pane id from the output> --trim`. In image mode, render a copy with `mermaid-view render <file> --format png -o <scratchpad>/check.png` and read the PNG. If anything is missing, fix the source before talking about the diagram.
+The parser silently drops lines it cannot read, so a diagram can render with missing nodes or edges and no error. After each call, check what was drawn: in text mode, read the pane with `rex capture -s "$REX_SESSION" -b <pane id from the output> --trim`. In image mode, render a copy with `mermaid-view render <file> --format png -o <tmp>/check.png` and look at the PNG if you can read images. If anything is missing, fix the source before talking about the diagram.
 
 Keep diagrams small enough to read in a side pane: about 12 nodes or 8 participants. Split a bigger system into an overview and a zoomed-in diagram, and show them one at a time. Use the names from the code for nodes and participants, and short verbs for edges.
 
