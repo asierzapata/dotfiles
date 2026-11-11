@@ -1,0 +1,9 @@
+{
+  "name": "mermaid-view",
+  "private": true,
+  "type": "module",
+  "description": "Render Mermaid diagrams with beautiful-mermaid and show them in a Rex pane.",
+  "dependencies": {
+    "beautiful-mermaid": "1.1.3"
+  }
+}

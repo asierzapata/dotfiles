@@ -1,0 +1,7 @@
+#!/bin/sh
+# Render Mermaid diagrams and show them in a Rex pane. See: mermaid-view --help
+dir="$HOME/.dotfiles/mermaid-view"
+if [ ! -d "$dir/node_modules/beautiful-mermaid" ]; then
+  (cd "$dir" && bun install --frozen-lockfile >/dev/null) || exit 1
+fi
+exec bun "$dir/mermaid-view.ts" "$@"

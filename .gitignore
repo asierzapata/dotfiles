@@ -5,3 +5,4 @@ github-copilot/*
 google*
 .copilot
 hunk/state.json
+mermaid-view/node_modules
