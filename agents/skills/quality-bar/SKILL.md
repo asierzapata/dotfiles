@@ -64,6 +64,16 @@ When he wants to check his own understanding of a change, ask him these and let 
 
 Also say whether the change was run where it will really run, such as a browser for UI, or a production-like load for anything that changes what is loaded at startup. "Tests pass" and "it works in the real environment" are different claims.
 
+## Fresh eyes
+
+The agent that designed or wrote something shares its own blind spots, and after a long session so does he. A reviewer that starts with no memory of the conversation does not, which is why a design that only makes sense with the conversation behind it fails in front of one. Use a fresh subagent for this, given only the written design and the files it references, never a summary of what was discussed and never your own conclusions. A review done in the same context is not this review. Use it when the change is risky enough to deserve it, not on every change.
+
+- **Comprehension check.** Ask the fresh reviewer to say back, from the document alone, what the change does: the state, the transitions, and who owns what. Show him that paraphrase next to the intent. Where the two differ, the design is unclear or wrong on paper, and he can see it in a minute without reading the whole design again.
+- **Design review through his lenses.** Ask the fresh reviewer for what this skill cares about, not for general feedback: a transition with no answer for twice, concurrent, or halfway, a contract that says what it returns but not what it accepts, a caller that has to know how the layer below works, and a boundary that moves without being stated.
+- **Drift check after implementation.** Have a fresh reviewer compare the agreed design with the code that was written, and report where they differ. This is the direct way to find a boundary that moved by accident, or a transition that was implemented differently from what he accepted.
+
+A fresh reviewer produces a lot of findings, and passing them all on would cost him the attention this is meant to save. Triage them first: for each one, either propose the fix or say why you contest it, and bring him only the ones that change a decision. Re-check once after fixing. What is still open after that is a trade-off to state, not a reason for another round.
+
 ## How to show him things
 
 - **Bottom line first.** Open with what he has to decide right now and what is blocked until he does, before any explanation. Put each decision as a question he can answer in a few words, with your recommendation and the one reason behind it. If nothing needs a decision, say that first, so he knows the rest is for reading and not for answering. Then give the supporting detail below, in order of how much it matters to those decisions, and after that the things he may want to comment on but that do not block anything. He should be able to stop reading after the first block and still unblock you.
