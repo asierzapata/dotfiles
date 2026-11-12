@@ -1,5 +1,5 @@
 ---
-name: sdlc
+name: quality-bar
 description: What Asier cares about when a change is designed, built, tested, and reviewed, and what he finds useful to be shown along the way. Covers state and state transitions, the contracts and coupling at the boundaries between layers, boundaries that move, tests that prove behaviour through integration, and the questions a diff does not answer. Use when planning, designing, implementing, or reviewing a feature, a refactor, or a stack of PRs, when a change adds or moves state, runs concurrently, durably, or on retry, or crosses more than one layer or module, and when writing or reviewing tests. Skip it for a change with one obvious shape, such as a rename, a copy change, a config value, or a one-line fix.
 ---
 
