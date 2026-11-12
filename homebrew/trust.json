@@ -1,9 +1,11 @@
 {
   "trustedformulae": [
+    "asmvik/formulae/yabai",
     "d12frosted/emacs-plus/emacs-plus@29",
     "d12frosted/emacs-plus/emacs-plus@30"
   ],
   "trustedtaps": [
+    "asierzapata/saku",
     "felixkratz/formulae"
   ]
 }
