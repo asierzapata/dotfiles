@@ -4,7 +4,9 @@
       "Bash(./scripts/run_test.sh:*)",
       "Bash(find:*)",
       "Bash(cat:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(mermaid-view:*)",
+      "Bash(rex capture:*)"
     ]
   },
   "statusLine": {
