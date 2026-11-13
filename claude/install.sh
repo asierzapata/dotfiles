@@ -20,6 +20,10 @@ chmod +x "$DOTFILES_CLAUDE/statusline.sh"
 
 echo "  Linked statusline.sh"
 
+ln -sf "$DOTFILES_CLAUDE/statusline-worktree.sh" "$CLAUDE_DIR/statusline-worktree.sh"
+chmod +x "$DOTFILES_CLAUDE/statusline-worktree.sh"
+echo "  Linked statusline-worktree.sh"
+
 # Symlink command files
 if [ -d "$DOTFILES_CLAUDE/commands" ]; then
   for cmd_file in "$DOTFILES_CLAUDE/commands"/*.md; do
@@ -72,7 +76,7 @@ if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
   echo "  → You may want to add your AWS profile and other machine-specific settings"
 else
   echo "  settings.json already exists (not modified)"
-  echo "  → Ensure it has statusLine.command set to ~/.claude/statusline.sh"
+  echo "  → Ensure it has statusLine.command set to ~/.claude/statusline-worktree.sh"
 fi
 
 # Ensure the Rex long-running command hook is registered in settings.json

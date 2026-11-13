@@ -1,0 +1,3 @@
+# Worktrunk user config. Keep worktrees where the Rex worktree_new action puts
+# them (rex/init.lua), so `wt switch -c` and Rex sessions agree on one name.
+worktree-path = "../worktrees/{{ repo }}/{{ branch | sanitize }}"
