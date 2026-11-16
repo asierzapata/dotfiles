@@ -11,5 +11,8 @@ then
   brew bundle
 fi
 
-# find the installers and run them iteratively
-find . -name install.sh | while read installer ; do sh -c "${installer}" ; done
+# find the installers and run them iteratively. agents/install.sh runs last:
+# its `leaf agent setup` writes ~/.claude/settings.json, which would stop
+# claude/install.sh from creating it from the template.
+find . -name install.sh -not -path './agents/*' | while read installer ; do sh -c "${installer}" ; done
+sh -c ./agents/install.sh

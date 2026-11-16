@@ -1,5 +1,5 @@
 # Worktree sessions from the shell, using the worktree_new and worktree_remove
-# actions in rex/init.lua, so the worktree, the branch and the Rex session share
+# actions in rex/config.lua, so the worktree, the branch and the Rex session share
 # one name.
 #
 #   wtn master__search-ranking [base]   create or reuse, and show the session
