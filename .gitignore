@@ -4,6 +4,7 @@ github-copilot/*
 1Password/*
 google*
 .copilot
-hunk/state.json
 mermaid-view/node_modules
 devin/AGENTS.md
+rex/init.lua
+rex/plugins/
