@@ -47,6 +47,23 @@ link_skills() {
   echo "  $label skills: $dir"
 }
 
+# drop_leaf_copies: remove the skill copies leaf installs itself, which carry
+# a `leaf-skill:` stamp in their frontmatter. The leaf skills live in
+# agents/skills instead, and human-review replaces leaf-review. Links to the
+# dotfiles have no stamp, so they stay.
+drop_leaf_copies() {
+  for dir in "$HOME/.claude/skills" "$HOME/.agents/skills" "$HOME/.cursor/skills" "$HOME/.gemini/config/skills"; do
+    for name in leaf leaf-plan leaf-review; do
+      target="$dir/$name"
+      if [ -d "$target" ] && [ ! -L "$target" ] && grep -q '^  leaf-skill:' "$target/SKILL.md" 2>/dev/null; then
+        rm -rf "$target" && echo "  Removed leaf's own copy of $target"
+      fi
+    done
+  done
+}
+
+drop_leaf_copies
+
 # Claude Code reads its own folder. claude/CLAUDE.md imports AGENTS.md and is
 # linked by claude/install.sh.
 link_skills "Claude Code" "$HOME/.claude/skills"
@@ -71,11 +88,12 @@ if [ -d "$HOME/.gemini" ]; then
   [ -d "$HOME/.gemini/antigravity-cli" ] && link_skills "Antigravity CLI" "$HOME/.gemini/antigravity-cli/skills"
 fi
 
-# leaf ships its own skills (leaf, leaf-plan, leaf-review) and a plan review
-# hook for each agent CLI. It keeps its copies current and never touches one
-# that was edited, so it manages them instead of agents/skills.
+# leaf's plan review hook for each agent CLI. `leaf agent setup` has no
+# hooks-only mode and installs any of its skills that are missing, so drop
+# those copies again afterwards. It leaves the linked ones alone.
 if command -v leaf >/dev/null 2>&1; then
   leaf agent setup --yes
+  drop_leaf_copies
 fi
 
 exit 0

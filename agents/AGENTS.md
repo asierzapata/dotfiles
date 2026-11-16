@@ -15,7 +15,7 @@ rex window new -s "$REX_SESSION" <TabName> -c <project_dir> --keep-open --focus=
 
 ## Leaf
 
-leaf is my terminal reader and reviewer. Its `leaf`, `leaf-plan` and `leaf-review` skills
+leaf is my terminal reader and reviewer. The `leaf`, `leaf-plan` and `human-review` skills
 cover how to drive it; this is when to reach for it.
 
 - Plans: when you write a plan, spec or design that needs my sign-off, hand it to me with
@@ -24,10 +24,9 @@ cover how to drive it; this is when to reach for it.
 - Reading: to show me a PDF, EPUB, Markdown file, article, diff or pull request, open it
   with leaf in a Rex pane beside yours (`rex split --split=right -- leaf open <file>`).
   Never run a bare `leaf` command in your own shell; it needs a terminal.
-- Code review: `/human-review` and requests to review a change "in Hunk" still use Hunk.
-  Use `leaf review` (the `leaf-review` skill) when I ask for a review in leaf, or when you
-  finish a change and I asked you to hand it to me for review. Don't open one unprompted
-  after every change.
+- Code review: when I want to review a change myself, use the `human-review` skill, which
+  opens it with `leaf review`. Do this when I ask, or when you finish a change and I asked
+  you to hand it to me for review. Don't open one unprompted after every change.
 - Questions I send from leaf (selected lines with `@`) arrive pasted into your pane with
   the file and line numbers. Treat them as my message.
 

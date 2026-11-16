@@ -1,100 +1,68 @@
 ---
 name: human-review
-description: Let Asier review a change himself, visually, in Hunk. Opens the diff in a new Rex tab, then iterates with him on the inline comments he leaves there, answering, changing code, and leaving agent notes on the lines. Use when Asier runs /human-review, or wants to review, look at, or go through a change, branch, commit, or diff himself, "in Hunk", "visually", "with comments", or "together". Not for an automated review by an agent, which is review-change or code-review.
-argument-hint: "[uncommitted | <ref> | <from>..<to>] [-- <pathspec>]"
+description: Let Asier review a change himself, visually, in leaf. Opens the diff in a pane beside yours, then works through the review he sends back, answering, changing code, and reopening the review until he approves. Use when Asier runs /human-review, or wants to review, look at, or go through a change, branch, commit, diff or pull request himself, "in leaf", "visually", "with comments", or "together", or when you finish a change he asked to review. Not for an automated review by an agent, which is review-change or code-review.
+argument-hint: "[uncommitted | staged | <ref> | <from>..<to> | <pr url>] [-- <pathspec>]"
 ---
 
-# Human review in Hunk
+# Human review in leaf
 
-Asier reviews the diff in Hunk, a terminal diff viewer, and leaves inline comments there. Your job is to open the diff, read those comments, answer or act on each one in the same place, and keep the view current while you iterate. Hunk is his UI: never run `hunk diff` or `hunk show` in your own shell, only through Rex in a new tab. Control the open session with `hunk session *`.
+Asier reviews the diff in leaf, a terminal diff viewer, and sends his notes back as one review with a verdict. Your job is to open the right diff, act on every note in the review, and reopen it until he approves. leaf is his UI: run `leaf review` from your shell, which opens it in a pane beside yours, and never run `leaf diff` or a bare `leaf` there, since your shell has no terminal.
 
-Run `hunk skill path` and read that file once per session for the full `hunk session` reference. This skill only covers the workflow.
-
-## 1. Choose what to diff
+## 1. Choose what to review
 
 Use the argument when there is one:
 
-- No argument: the whole branch, meaning committed and uncommitted changes. Diff against the merge base with the remote default branch, not the local one, because a stale local `master` adds hundreds of unrelated files. Get it with `git merge-base origin/HEAD HEAD`, falling back to `origin/master` or `origin/main`. Run `git fetch origin <default>` first only if the merge base looks wrong.
-- `uncommitted`: `hunk diff` with no target.
-- A ref or a range: pass it through as it is.
+- No argument: the whole branch, meaning committed and uncommitted changes, against the remote default branch. Use `--branch --base origin/<default>`, with the default from `git symbolic-ref --short refs/remotes/origin/HEAD` (fall back to `origin/master` or `origin/main`). Don't diff against the local default branch, because a stale local `master` adds hundreds of unrelated files. Run `git fetch origin <default>` first only if the result looks wrong.
+- `uncommitted`: no target, which reviews unstaged changes.
+- `staged`: `--staged`.
+- A ref or a range: pass it through as it is, such as `main...HEAD`.
+- A pull request URL: pass it through.
 - Anything after `--` is a pathspec that limits the files.
 
-Before opening, check with `git diff --stat <target>` that the file count is plausible for the change. If it is not, say so and fix the target instead of opening a misleading diff.
+Before opening, check with `git diff --stat <target>` that the file count is plausible for the change. If it is not, say so and fix the target instead of opening a misleading diff. Make sure the change builds and its tests pass, so the review is about the change and not broken code.
 
-## 2. Open it in a new Rex tab
-
-Load the `rex` skill if this session has not used Rex yet. Then open a tab in your own session, named after the branch:
+## 2. Open it
 
 ```sh
-rex window new -s "$REX_SESSION" "Review: <branch>" -c "<repo root>" --json -- hunk diff <target> [-- <pathspec>]
+leaf review [target] [-- <pathspec>]
 ```
 
-Save the returned `window_id` and `block_ids[0]`. Wait a second, then find the session with `hunk session list --json` and match it by `repoRoot`. If more than one session matches the repo, use the newest `launchedAt` and pass its `sessionId` to every later command instead of `--repo`. Confirm the tab rendered with `rex capture -s "$REX_SESSION" -b <block> --trim | head -3` and check the file count in its header.
+Inside Rex, this opens the review in a pane beside yours and returns at once with "Opened the changes for review". Tell him in one or two sentences what the review covers: how many files, and what it is compared against.
 
-If Asier already has a Hunk session for this repo, reuse it with `hunk session reload ... -- diff <target>` instead of opening a second tab.
+Then **end your turn**. Don't wait, sleep, poll or read the pane. His review arrives as your next message.
 
-Then tell him the tab is open, how many files and lines it covers, and what it is compared against, in one or two sentences. Ask him to leave comments in Hunk and tell you when he is done. Do not start reading comments on your own until he says so.
+If leaf says there is nowhere to open it (you are not in Rex, tmux or Herdr), tell him the exact command to run in his terminal. In a script that has to block, `leaf review --wait …` prints the review to stdout when he sends it.
 
-## 3. Read his comments
+## 3. Questions during the review
 
-When he says he is done, list his notes:
+While he reviews, he can select lines and press `@`, which pastes a question into your pane with the file, line numbers and the diff around them. Treat it as his message and answer it in the conversation. Don't change code for it unless he asks; his review is still open.
 
-```sh
-hunk session comment list <session> --type user --json
-```
+## 4. Work through the review
 
-Always pass `--type user`. Without it, the listing shows only agent notes, such as review-change findings and your own replies, and his notes are missing from it. An empty or agent-only result is not proof that he left no comments.
+The review is one message headed `# Review of …: <verdict>`, grouped by file in diff order. A `Global:` note is on the whole change. A whole-file note comes before that file's line notes, and each line note quotes the hunk it is on. "Old side" line numbers refer to the file before the change, and "new side" to after.
 
-Read the code around each note before answering, with `hunk session review <session> --include-patch --json` for the files involved, or by reading the files. Comments can be questions, change requests, or remarks. Treat them in file order, and group comments that ask for the same change.
+Read the code around each note before acting on it. Treat notes in order, and group the ones that ask for the same change:
 
-## 4. Answer in Hunk
+- A question: answer it in your reply, in a few sentences.
+- A change request that is clear: make the change.
+- A change request that is ambiguous, or that would expand the scope of the branch: don't change code. Give the options and your recommendation, and wait.
+- A disagreement: if you think the request is wrong, say why and don't make the change until he confirms.
 
-Reply to every note in Hunk, so the conversation stays next to the code. Pass your own agent name as `--author`, such as Claude, Codex, Devin, or Antigravity:
+Then act on the verdict:
 
-```sh
-hunk session comment add <session> --reply-to <note-id> --summary "<answer>" --author <you>
-```
+- **approved**: the change is done. Go to step 6.
+- **approved with notes**: apply every numbered item, then go to step 6.
+- **changes requested**: address every numbered item, then go to step 5.
 
-- A question: answer it in the reply. Keep it to a few sentences.
-- A change request that is clear: make the change, then reply with what you changed in one sentence.
-- A change request that is ambiguous, or that would expand the scope of the branch: do not change code. Reply with the options and your recommendation, and wait.
-- A disagreement: if you think the request is wrong, say why in the reply and do not make the change until he confirms.
+If the message says the review was closed without a verdict, ask him how he'd like to go on.
 
-Prefer one `hunk session comment apply <session> --stdin` batch when you have several replies ready. Never delete or edit his notes.
+In the conversation, give a short summary by note number: which ones you changed code for, which you only answered, and which wait for his decision. Don't repeat the notes back.
 
-### Leave your own notes
+## 5. Next round
 
-Hunk shows agent notes by default, so you can also start a note on a line instead of only replying. Use one when something in the diff needs his attention: a change you made on a line he did not comment on, a risk you spotted, or a decision he should confirm. Anchor it to the line in the new version, or use `--old-line` for a deleted line:
-
-```sh
-hunk session comment add <session> --file <path> --new-line <n> --summary "<one-line point>" --rationale "<why, if it needs more>" --author <you>
-```
-
-For several notes, send one batch. Each item has `summary` and either `replyTo` alone, or `filePath` with one of `newLine`, `oldLine`, or `hunk`:
-
-```sh
-printf '%s\n' '{"comments":[{"filePath":"src/a.js","newLine":42,"summary":"...","rationale":"...","author":"<you>"}]}' | hunk session comment apply <session> --stdin
-```
-
-Keep the summary to one line and put the explanation in the rationale. Add `--focus` only when you want to move his view to the note. Do not repeat in a note what a reply already says.
-
-In the conversation, give a short summary: which comments you changed code for, which you only answered, and which wait for his decision. Do not repeat the replies.
-
-## 5. Refresh and iterate
-
-After changing code, reload the session with the same target so he sees the new diff:
-
-```sh
-hunk session reload <session> -- diff <target> [-- <pathspec>]
-```
-
-A reload can drop notes on lines that changed. If his notes disappear after a reload, mention which ones were resolved by the change. When a reply concerns a specific line, `hunk session navigate <session> --file <path> --new-line <n>` moves his view there.
-
-Run the checks that can catch a plausible failure in what you changed, such as the spec next to the edited file or the linter, before saying that a round is ready. Then wait for his next round of comments and repeat steps 3 to 5.
+Run the checks that can catch a plausible failure in what you changed, such as the spec next to the edited file or the linter. Then run the same `leaf review` command again, so he sees the new diff, and end your turn. Repeat steps 4 and 5 until he approves.
 
 ## 6. Finish
 
-When he says the review is done:
-
-- Do not commit, push, or open a PR unless he asks. If he asks, follow the repository's rules for commits and PRs.
-- Close the Hunk tab only if he asks, with `rex window close <window_id>`.
+- Don't commit, push, or open a PR unless he asks. If he asks, follow the repository's rules for commits and PRs.
+- The leaf pane closes when he sends the review. Saved comments stay in leaf's store; `leaf comments --json` lists them if you need them again.
