@@ -71,4 +71,11 @@ if [ -d "$HOME/.gemini" ]; then
   [ -d "$HOME/.gemini/antigravity-cli" ] && link_skills "Antigravity CLI" "$HOME/.gemini/antigravity-cli/skills"
 fi
 
+# leaf ships its own skills (leaf, leaf-plan, leaf-review) and a plan review
+# hook for each agent CLI. It keeps its copies current and never touches one
+# that was edited, so it manages them instead of agents/skills.
+if command -v leaf >/dev/null 2>&1; then
+  leaf agent setup --yes
+fi
+
 exit 0
