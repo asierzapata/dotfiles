@@ -140,29 +140,121 @@ rex.bind("tmux/z", "then_normal", { action = "pane.zoom" })
 rex.bind("tmux/x", "then_normal", { action = "pane.close" })
 
 -- Worktrees ----------------------------------------------------------------
--- One git worktree per task, each in its own session labeled after the branch.
+-- One Rex session per git worktree, in any repo under ~/Documents/Projects.
+-- A worktree's session is labeled <repo>/<name>, so it is found again by name:
+--
+--   Edpuzzle-Web/main              the main checkout
+--   Edpuzzle-Web/search-ranking    worktrees/Edpuzzle-Web/search-ranking
+--   Edpuzzle-Web/badger-cli        a sibling such as Edpuzzle-Web-badger-cli
+--
+-- New worktrees go to worktrees/<repo>/<branch>, where `wt switch -c` puts them
+-- too (worktrunk/config.toml). The palette prompts need rex.ui; from the CLI
+-- every action also takes its answers as arguments (rex/worktree.zsh).
 
-local worktree_repo = os.getenv("HOME") .. "/Documents/Projects/Edpuzzle-Web"
-local worktree_root = os.getenv("HOME") .. "/Documents/Projects/worktrees/Edpuzzle-Web"
+local home = os.getenv("HOME")
+local projects_dir = home .. "/Documents/Projects"
+local worktrees_dir = projects_dir .. "/worktrees"
+local default_repo = projects_dir .. "/Edpuzzle-Web"
 
+local function basename(path)
+  return (path:gsub("/+$", ""):match("([^/]+)$"))
+end
+
+local function starts_with(s, prefix)
+  return s:sub(1, #prefix) == prefix
+end
+
+-- Worktrunk's `sanitize` filter: path separators become dashes.
 local function worktree_slug(branch)
-  return (branch:gsub("/", "-"))
+  return (branch:gsub("[/\\]", "-"))
+end
+
+local function exec(argv, cwd)
+  local r, err = rex.exec(argv, { cwd = cwd or "/", timeout = 25 })
+  if r == nil then error(err, 0) end
+  return r
 end
 
 local function git(args, cwd)
   local argv = { "git" }
   for _, a in ipairs(args) do argv[#argv + 1] = a end
-  local r, err = rex.exec(argv, { cwd = cwd or worktree_repo, timeout = 25 })
-  if r == nil then error(err, 0) end
-  return r
+  return exec(argv, cwd)
 end
 
-local function find_session(label)
+local function lines(s)
+  local out = {}
+  for line in (s or ""):gmatch("[^\n]+") do out[#out + 1] = line end
+  return out
+end
+
+-- rex.ui is on the Bleeding Edge channel for now. Without it, the actions
+-- still work when every answer comes in as an argument.
+local function ask(kind, spec)
+  if rex.ui == nil then
+    error("this Rex has no rex.ui yet; pass the arguments instead (rex do ... key=value)", 0)
+  end
+  return rex.ui[kind](spec)
+end
+
+-- Repos are the folders under projects_dir whose .git is a directory, so
+-- linked worktrees (whose .git is a file) don't show up as projects.
+local function list_repos()
+  local r = exec({ "find", projects_dir, "-mindepth", "2", "-maxdepth", "2",
+                   "-name", ".git", "-type", "d" })
+  local repos = {}
+  for _, line in ipairs(lines(r.stdout)) do
+    repos[#repos + 1] = line:gsub("/%.git$", "")
+  end
+  table.sort(repos, function(a, b) return a:lower() < b:lower() end)
+  return repos
+end
+
+local function list_worktrees(repo)
+  local r = git({ "worktree", "list", "--porcelain" }, repo)
+  if not r.ok then error(r.stderr, 0) end
+  local list, cur = {}, nil
+  for _, line in ipairs(lines(r.stdout)) do
+    local key, value = line:match("^(%S+)%s?(.*)$")
+    if key == "worktree" then
+      cur = { path = value }
+      list[#list + 1] = cur
+    elseif cur and key == "branch" then
+      cur.branch = value:gsub("^refs/heads/", "")
+    elseif cur and (key == "detached" or key == "bare" or key == "prunable") then
+      cur[key] = true
+    end
+  end
+  return list
+end
+
+-- The name half of a session label: stable for as long as the folder exists,
+-- even when the worktree switches branches.
+local function worktree_name(repo, path)
+  local repo_name = basename(repo)
+  if path == repo then return "main" end
+  local managed = worktrees_dir .. "/" .. repo_name .. "/"
+  if starts_with(path, managed) then return path:sub(#managed + 1) end
+  local name = basename(path)
+  for _, sep in ipairs({ "-", ".", "_" }) do
+    if starts_with(name, repo_name .. sep) and #name > #repo_name + 1 then
+      return name:sub(#repo_name + 2)
+    end
+  end
+  return name
+end
+
+local function session_label(repo, path)
+  return basename(repo) .. "/" .. worktree_name(repo, path)
+end
+
+local function sessions_by_label()
   local list, err = rex.call("session.list")
   if list == nil then error(err, 0) end
+  local by_label = {}
   for _, s in ipairs(list.sessions or {}) do
-    if s.label == label then return s.session_id end
+    if s.label then by_label[s.label] = s.session_id end
   end
+  return by_label
 end
 
 -- Only the app that ran the action can switch to the session. From the CLI the
@@ -173,66 +265,206 @@ local function show_session(ctx, session_id)
   end
 end
 
+-- Focus the worktree's session, creating it (Shell + Claude tabs) if needed.
+local function open_worktree_session(ctx, repo, path)
+  local label = session_label(repo, path)
+  local existing = sessions_by_label()[label]
+  if existing then
+    show_session(ctx, existing)
+    return { session_id = existing, label = label, dir = path, created = false }
+  end
+
+  local shell = "com.superlogical.terminal.shell"
+  local s, err = rex.call("session.create", {
+    label = label,
+    initial_windows = {
+      { window_label = "Shell", layout = { block = { flavor = shell, options = { cwd = path } } } },
+      { window_label = "Claude", layout = { block = { flavor = shell, options = { cwd = path, command = { "claude" } } } } },
+    },
+  })
+  if s == nil then error(err, 0) end
+  show_session(ctx, s.session_id)
+  return { session_id = s.session_id, label = label, dir = path, created = true }
+end
+
+local function close_session(label)
+  local session_id = sessions_by_label()[label]
+  if not session_id then return false end
+  -- session.destroy only accepts sessions this connection is attached to.
+  local _, err = rex.call("session.attach", { session_id = session_id })
+  if err == nil then _, err = rex.call("session.destroy", { session_id = session_id }) end
+  if err ~= nil then error("closing session " .. label .. " failed: " .. err, 0) end
+  return true
+end
+
+local function pick_repo(args)
+  if args.repo then
+    return args.repo:find("/") and args.repo or (projects_dir .. "/" .. args.repo)
+  end
+  local items = {}
+  for _, repo in ipairs(list_repos()) do
+    local n = #list_worktrees(repo)
+    items[#items + 1] = {
+      id = repo, title = basename(repo), icon = "folder",
+      subtitle = repo:gsub("^" .. home:gsub("%p", "%%%0"), "~"),
+      detail = n > 1 and (n .. " worktrees") or nil,
+    }
+  end
+  return ask("pick", { title = "Project", placeholder = "Filter projects", items = items })
+end
+
+-- Recent local branches, newest first, with master or main on top.
+local function pick_base(repo)
+  local r = git({ "for-each-ref", "--sort=-committerdate", "--count=50",
+                  "--format=%(refname:short)", "refs/heads" }, repo)
+  local items, seen = {}, {}
+  for _, b in ipairs({ "master", "main" }) do
+    if git({ "rev-parse", "--verify", "--quiet", "refs/heads/" .. b }, repo).ok then
+      items[#items + 1] = { id = b, icon = "star" }
+      seen[b] = true
+    end
+  end
+  for _, b in ipairs(lines(r.stdout)) do
+    if not seen[b] then items[#items + 1] = { id = b, icon = "branch" } end
+  end
+  local base = ask("pick", { title = "Base branch", placeholder = "Filter branches",
+                             items = items, allow_other = true })
+  if type(base) == "table" then base = base.text end
+  return base
+end
+
+-- Create (or find) the worktree for a branch and return its path.
+local function ensure_worktree(repo, branch, base)
+  for _, wt in ipairs(list_worktrees(repo)) do
+    if wt.branch == branch then return wt.path end
+  end
+  local dir = worktrees_dir .. "/" .. basename(repo) .. "/" .. worktree_slug(branch)
+  local add
+  if git({ "rev-parse", "--verify", "--quiet", "refs/heads/" .. branch }, repo).ok then
+    add = git({ "worktree", "add", dir, branch }, repo)
+  else
+    add = git({ "worktree", "add", "-b", branch, dir, base or "master" }, repo)
+  end
+  if not add.ok then error(add.stderr, 0) end
+  return dir
+end
+
+local function new_worktree(ctx, repo, branch, base)
+  if branch == nil then
+    branch = ask("input", { title = "New branch in " .. basename(repo),
+                            placeholder = "area__short-description", confirm = "Next" })
+    if branch == nil or branch == "" then return end
+  end
+  if base == nil and not git({ "rev-parse", "--verify", "--quiet",
+                               "refs/heads/" .. branch }, repo).ok then
+    base = pick_base(repo)
+    if base == nil then return end
+  end
+  return open_worktree_session(ctx, repo, ensure_worktree(repo, branch, base))
+end
+
+rex.action{
+  name        = "worktree_open",
+  title       = "Worktree: Open…",
+  description = "Pick a project and one of its worktrees, and switch to that worktree's session, creating it if needed. Type a branch name to create a new worktree.",
+  keywords    = "git branch task session switch project",
+  args        = { repo = "string?", path = "string?" },
+  run         = function(ctx, args)
+    local repo = pick_repo(args)
+    if repo == nil then return end
+
+    local path = args.path
+    if path == nil then
+      local open = sessions_by_label()
+      local items = { { id = "+new", title = "New worktree…", icon = "plus" } }
+      for _, wt in ipairs(list_worktrees(repo)) do
+        if not wt.bare and not wt.prunable then
+          items[#items + 1] = {
+            id       = wt.path,
+            title    = worktree_name(repo, wt.path),
+            subtitle = wt.branch or "detached HEAD",
+            icon     = wt.path == repo and "folder" or "branch",
+            detail   = open[session_label(repo, wt.path)] and "● session" or nil,
+          }
+        end
+      end
+      local choice = ask("pick", {
+        title = basename(repo) .. " worktrees", items = items, allow_other = true,
+        placeholder = "Filter, or type a new branch name",
+      })
+      if choice == nil then return end
+      if choice == "+new" then return new_worktree(ctx, repo) end
+      if type(choice) == "table" then return new_worktree(ctx, repo, choice.text) end
+      path = choice
+    end
+    return open_worktree_session(ctx, repo, path)
+  end,
+}
+
 rex.action{
   name        = "worktree_new",
-  title       = "New Worktree Session",
+  title       = "Worktree: New…",
   description = "Create a git worktree for a branch and open a session with Claude in it.",
   keywords    = "git branch task",
-  args        = { branch = "string", base = "string?" },
+  args        = { branch = "string?", base = "string?", repo = "string?" },
   run         = function(ctx, args)
-    local slug = worktree_slug(args.branch)
-    local dir = worktree_root .. "/" .. slug
-
-    local existing = find_session(slug)
-    if existing then
-      show_session(ctx, existing)
-      return { session_id = existing, dir = dir, created = false }
-    end
-
-    if not git({ "-C", dir, "rev-parse", "--git-dir" }, "/").ok then
-      local add
-      if git({ "rev-parse", "--verify", "--quiet", "refs/heads/" .. args.branch }).ok then
-        add = git({ "worktree", "add", dir, args.branch })
-      else
-        add = git({ "worktree", "add", "-b", args.branch, dir, args.base or "master" })
-      end
-      if not add.ok then error(add.stderr, 0) end
-    end
-
-    local shell = "com.superlogical.terminal.shell"
-    local s, err = rex.call("session.create", {
-      label = slug,
-      initial_windows = {
-        { window_label = "Shell", layout = { block = { flavor = shell, options = { cwd = dir } } } },
-        { window_label = "Claude", layout = { block = { flavor = shell, options = { cwd = dir, command = { "claude" } } } } },
-      },
-    })
-    if s == nil then error(err, 0) end
-    show_session(ctx, s.session_id)
-    return { session_id = s.session_id, dir = dir, created = true }
+    -- Without a repo from the CLI, keep the old default instead of asking.
+    if args.repo == nil and args.branch ~= nil then args.repo = default_repo end
+    local repo = pick_repo(args)
+    if repo == nil then return end
+    return new_worktree(ctx, repo, args.branch, args.base)
   end,
 }
 
 rex.action{
   name        = "worktree_remove",
-  title       = "Remove Worktree Session",
-  description = "Remove a branch's worktree and close its session. Refuses when the worktree has uncommitted changes. Keeps the branch.",
+  title       = "Worktree: Remove…",
+  description = "Remove worktrees and close their sessions. Refuses a worktree with uncommitted changes. Keeps the branches.",
   keywords    = "git branch task delete close",
-  args        = { branch = "string" },
+  args        = { branch = "string?", repo = "string?" },
   run         = function(ctx, args)
-    local slug = worktree_slug(args.branch)
-    local dir = worktree_root .. "/" .. slug
+    if args.repo == nil and args.branch ~= nil then args.repo = default_repo end
+    local repo = pick_repo(args)
+    if repo == nil then return end
 
-    local r = git({ "worktree", "remove", dir })
-    if not r.ok then error(r.stderr, 0) end
-
-    local session_id = find_session(slug)
-    if session_id then
-      -- session.destroy only accepts sessions this connection is attached to.
-      local _, err = rex.call("session.attach", { session_id = session_id })
-      if err == nil then _, err = rex.call("session.destroy", { session_id = session_id }) end
-      if err ~= nil then error("worktree removed, but closing the session failed: " .. err, 0) end
+    local worktrees = list_worktrees(repo)
+    local paths = {}
+    if args.branch then
+      for _, wt in ipairs(worktrees) do
+        if wt.branch == args.branch then paths[1] = wt.path end
+      end
+      if #paths == 0 then error("no worktree has branch " .. args.branch, 0) end
+    else
+      local items = {}
+      for _, wt in ipairs(worktrees) do
+        if wt.path ~= repo and not wt.bare then
+          local dirty = not wt.prunable
+            and git({ "status", "--porcelain" }, wt.path).stdout ~= ""
+          items[#items + 1] = {
+            id = wt.path, title = worktree_name(repo, wt.path),
+            subtitle = wt.branch or "detached HEAD", icon = "branch",
+            detail = wt.prunable and "missing" or (dirty and "changes" or nil),
+          }
+        end
+      end
+      paths = ask("pick", { title = "Remove worktrees", multiple = true,
+                            confirm = "Remove", items = items })
+      if paths == nil or #paths == 0 then return end
     end
-    return { removed = dir, session_closed = session_id ~= nil }
+
+    local removed, failed = {}, {}
+    for _, path in ipairs(paths) do
+      local r = git({ "worktree", "remove", path }, repo)
+      if r.ok then
+        close_session(session_label(repo, path))
+        removed[#removed + 1] = path
+      else
+        failed[#failed + 1] = path .. ": " .. r.stderr
+      end
+    end
+    if #failed > 0 then error(table.concat(failed, "\n"), 0) end
+    return { removed = removed }
   end,
 }
+
+rex.bind("ctrl+a>w", "worktree_open")
