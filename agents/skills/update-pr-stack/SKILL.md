@@ -78,6 +78,8 @@ Use `--upstack` or `--downstack` to limit the rebase to part of the stack. If th
 
 On a conflict, `gh stack rebase` stops and lists the conflicted files. Report them to the user, and resolve only what they ask for. Then run `git add` and `gh stack rebase --continue`, or `gh stack rebase --abort` to restore every branch.
 
+Stay on `gh stack` for the whole update, including when a lower branch needs a new commit (commit it, then `gh stack rebase --upstack`). If `gh stack` or a git command fails with `Unable to create '.../index.lock': File exists`, another process, usually an editor or terminal polling `git status`, holds the lock for a moment. Wait until the lock file is gone and retry the same command instead of switching to a manual `git rebase --onto` and push. If `gh stack rebase` rolls the branches back after such a failure, run it again.
+
 Do not use `gh stack sync` as a shortcut for steps 3 to 6. It pushes right after the rebase, and you lose the chance to check for remote-only commits and verify the result first.
 
 ### 7. Verify and report
