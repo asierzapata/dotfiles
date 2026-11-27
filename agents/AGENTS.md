@@ -1,3 +1,10 @@
+## Quality bar
+
+The `quality-bar` skill describes what I care about in a change and how I want it shown to
+me. Load it before you plan, design, implement, or review anything that is not trivial, and
+before you write or review tests. Skip it for a change with one obvious shape, such as a
+rename, a copy change, a config value, or a one-line fix.
+
 ## Rex
 
 When running inside Rex (`REX_SESSION` is set), start long-running or non-terminating
