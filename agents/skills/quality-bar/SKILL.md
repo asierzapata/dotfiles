@@ -1,25 +1,43 @@
 ---
 name: quality-bar
-description: What Asier cares about when a change is designed, built, tested, and reviewed, and what he finds useful to be shown along the way. Covers state and state transitions, the contracts and coupling at the boundaries between layers, boundaries that move, tests that prove behaviour through integration, and the questions a diff does not answer. Use when planning, designing, implementing, or reviewing a feature, a refactor, or a stack of PRs, when a change adds or moves state, runs concurrently, durably, or on retry, or crosses more than one layer or module, and when writing or reviewing tests. Skip it for a change with one obvious shape, such as a rename, a copy change, a config value, or a one-line fix.
+description: What Asier cares about when a change is designed, built, tested, and reviewed, and what he finds useful to be shown along the way. Covers how to approach the work (restating the goal, first principles, design before code, subtraction, a consistent vocabulary, blast radius, evidence behind every claim, root causes), state and state transitions, the contracts and coupling at the boundaries between layers, boundaries that move, tests that prove behaviour through integration, and the questions a diff does not answer. Use when planning, designing, implementing, or reviewing a feature, a refactor, or a stack of PRs, when a change adds or moves state, runs concurrently, durably, or on retry, or crosses more than one layer or module, and when writing or reviewing tests. Skip it for a change with one obvious shape, such as a rename, a copy change, a config value, or a one-line fix.
 ---
 
-# What Asier cares about in a change
+# My quality bar
 
-This is not a process. It describes what Asier looks at and why, so that you can apply it with judgment at whatever point of the work you are in: planning, coding, writing tests, or reviewing. Use the parts that fit the change and scale them to its risk. A small change may need two sentences from here, and a durable workflow may need all of it.
+This is not a process. It describes what I look at and why, so that you can apply it with judgment at whatever point of the work you are in: planning, coding, writing tests, or reviewing. Use the parts that fit the change and scale them to its risk. A small change may need two sentences from here, and a durable workflow may need all of it.
 
-The reason it exists: the defects his teammates caught in review were almost never in the lines of the diff. They were two callers interleaving, a failure being replayed, a layer patched for a responsibility it did not own, and tests that passed without proving what they named. Reading code harder does not find those. Thinking about state, boundaries, and test cases does, so that is where he wants both his attention and yours.
+## How I want the work approached
 
-Use the project's own skills for how things are done there, such as its architecture check, its review, and its PR skill. This skill is about what deserves attention.
+When the decisions and the communication along the way are right, the code and the tests usually follow. So this is where I want the most care.
+
+**Restate the goal first.** Before starting anything that is not trivial, say back in a sentence or two what I am trying to achieve and the smallest change that gets there. When I explain a new concept, restate that concept, not the nearest existing mechanism it resembles.
+
+**Start from the problem, not from what exists.** Ask what you would build if this requirement had been there from the start. An existing design, prototype, convention, or earlier answer is input to weigh, not the frame to fit into. When I propose something, critique it honestly. Agreeing is not the job. When two fixes built on the same assumption have failed, write the assumption down and test it before trying a third.
+
+**Agree the shape before writing code.** For anything with a design, that means the data, which component owns each piece of state, and the boundaries, before the first file. Sketch at least two shapes and recommend the one where callers need to know least. Once the design is agreed and I hand over the execution, proceed without asking at every step.
+
+**Subtract before you add.** Build for how the thing is used today. A new flag, mode, option, or piece of infrastructure needs a real need behind it, and "we add it later if this decision bites us" is usually the right answer. When a design keeps growing mechanisms to handle its own cases, step back and look for the simpler model, often by moving the decision to one place. This is not the same as choosing the smaller diff: I will take a larger change that puts a rule in the layer that owns it over a small patch. The goal is the fewest moving parts, not the fewest lines. A useful test is whether a new reader can quickly answer "where does X come from?" and "what can change X?".
+
+**One name per concept.** Use the vocabulary the codebase and the team already have. A new term, or a new meaning for an existing one, is my decision, so propose it as one and check that it does not collide with a word already in use. Define every term the first time you use it, including the ones coined during the session.
+
+**Match the speed to the blast radius.** Before deciding how careful to be, ask who is affected if this is wrong and how easily it is undone. An API other people build on, data migrations, shared environments, and anything outward facing go slowly and with proof. Internal code that few people touch and that can be reverted goes fast, without shims or staging. For a risky change, find the one fact it is safe because of and prove that fact, rather than listing everything that might go wrong. The test: if this turns out to be wrong after it ships, who notices, and what does it take to undo it? If the answer is "only me, and a revert", move fast. If it is anyone else, or something a revert does not undo, slow down.
+
+**Say how you know.** Every claim rests on some evidence, and I need to see which. From weakest to strongest: you said so, you pointed at the line, you showed the bad case cannot happen, you ran it, you reproduced it in the running app. State each claim at the level you reached, and mark anything at the first two levels as not verified. In practice: check against the current main branch, not a stale one. Use the real metric, not a sampled or approximated source. Look documentation up instead of answering from memory. Verify a review comment against the code before calling it a bug, and search before saying something does not exist. The test: for each claim in a message, could you paste the command output, the line, or the link that backs it? If not, it is a guess, and it should be marked as one.
+
+**Fix the cause, not the symptom.** Confirm the cause before proposing a fix. Ask whether the state that triggered the symptom should exist at all. If it should not, a guard where it surfaced hides the bug, and the fix belongs where that state was produced. "Bad luck" is not a cause until a second example rules out a pattern. When the cause is drift between environments, the drift is what to fix.
+
+**Turn repeated corrections into structure.** When the same correction comes up a second time, propose the lint rule, check, script, or skill change that makes it unnecessary, instead of another instruction to remember.
 
 ## State and transitions come first
 
-Before the code, he wants to know what state a change adds or changes, where it is stored, and which single component is allowed to write it. State with two writers is where most of the hard bugs start.
+Before the code, I want to know what state a change adds or changes, where it is stored, and which single component is allowed to write it. State with two writers is where most of the hard bugs start.
 
 Then the transitions. For each one, what triggers it, and what happens in three situations: it runs twice, it runs concurrently with another, and it stops halfway. A transition without an answer for those three is not designed yet, and it is better to say "I do not know what happens here" than to leave it unsaid. In durable, retried, or event-driven code these three are the normal case, not the edge case.
 
 ## Boundaries
 
-Most of his design decisions are about the boundaries between distinct parts of the system, such as a helper that turns events into actions, the dispatcher below it, and the work queue below that. Three things matter at each boundary a change touches.
+Most of my design decisions are about the boundaries between distinct parts of the system. Three things matter at each boundary a change touches.
 
 **The contract, in both directions.** What a layer accepts is as important as what it returns.
 
@@ -28,31 +46,31 @@ Most of his design decisions are about the boundaries between distinct parts of 
 
 **The coupling line.** What the caller has to know about the layer below for the call to be correct is the coupling, and the line is where that knowledge stops. Know where it sits today. When every caller has to carry the same rule, the line is too high.
 
-**Moves.** When a change moves a boundary, say so out loud, as its own statement and not folded into the description of the change: "This moves *responsibility* from *A* to *B*". Add what A stops knowing, what B now has to guarantee, and which other callers of B get the new behaviour without asking for it. If nothing moves, saying "no boundary moves" is useful too. A moved boundary is an architectural decision and it is his to make consciously, so it should never arrive as a side effect of an implementation detail. Boundaries move by accident during implementation more often than by plan. When you notice the code starting to do it, such as a caller handling something the layer below owns, raise it then.
+**Moves.** When a change moves a boundary, say so out loud, as its own statement and not folded into the description of the change: "This moves *responsibility* from *A* to *B*". Add what A stops knowing, what B now has to guarantee, and which other callers of B get the new behaviour without asking for it. If nothing moves, saying "no boundary moves" is useful too. A moved boundary is an architectural decision and it is mine to make consciously, so it should never arrive as a side effect of an implementation detail. When you notice the code starting to do it, such as a caller handling something the layer below owns, raise it then.
 
 ### Patch or design
 
-He redid a whole stack of PRs because idempotency was added in the event-to-action helper when it belonged to the dispatcher and the work queue below it. The first version worked, and it was a patch.
-
-A change is a patch when it handles a responsibility in a layer that does not own the state behind it, when a caller has to know how the layer below works, or when the same rule would have to be repeated in a second caller. Moving the coupling line down, so the owning layer carries the rule, is usually the design. When you see a patch, show him the design alternative and what it costs, even when it is larger, and let him choose. Do not pick the small version for him, and do not pick the large one either. For a stack of PRs, this is worth settling for the whole stack before the first PR exists.
+A change is a patch when it handles a responsibility in a layer that does not own the state behind it, when a caller has to know how the layer below works, or when the same rule would have to be repeated in a second caller. Moving the coupling line down, so the owning layer carries the rule, is usually the design. When you see a patch, show me the design alternative and what it costs, even when it is larger, and let me choose. Do not pick the small version for me, and do not pick the large one either. For a stack of PRs, this is worth settling for the whole stack before the first PR exists.
 
 ## Tests
 
-He has tended to gloss over tests and wants to stop. What helps him is seeing tests as cases, not as code.
+What helps me is seeing tests as cases, not as code.
 
 **Cases come from the design.** One per transition, the twice, concurrent, and halfway cases of the transitions that can meet them, and both sides of each contract: what a layer promises to return, and what it does with each input it should not accept. Agreeing the cases before the code is written is cheap and catches design gaps early, so offer the list when the change is risky enough to deserve it.
 
 **Integration first.** A case should enter through the public entry point, such as the endpoint, command, query, or event, and run against the real store and the real layers below. Replace only what leaves the system. A unit test is right for pure logic with many input combinations. A test that stubs the layer under suspicion proves nothing about it.
 
+**Test what the code owns.** Do not test the behaviour of the framework or library underneath, and do not keep an old test only because it exists.
+
 **A test must prove what it names.** For every case, be able to name the bug that would make it fail. Watch for a test whose input does not match its title, an assertion the setup already guarantees, a stub that returns the answer being asserted, and table rows where one field is only used for the name.
 
-**Breaking the code is the only real evidence.** For the cases that guard a transition or a contract, introduce the bug, run the test, confirm it fails, and restore the code. Tell him which tests still passed.
+**Breaking the code is the only real evidence.** For the cases that guard a transition or a contract, introduce the bug, run the test, confirm it fails, and restore the code. Tell me which tests still passed.
 
-When he reviews tests, a table serves him better than the test file: the case, what it enters through, what is real, what is replaced, the bug it would catch, and the file and line. Fill it from what the test really does, not from its title. List what is not tested and why, so a gap is his decision and not an omission. A reviewer that did not write the tests fills this table more honestly than the author, so use a fresh subagent for it when the change matters.
+When I review tests, a table serves me better than the test file: the case, what it enters through, what is real, what is replaced, the bug it would catch, and the file and line. Fill it from what the test really does, not from its title. List what is not tested and why, so a gap is my decision and not an omission. A reviewer that did not write the tests fills this table more honestly than the author, so use a fresh subagent for it when the change matters.
 
 ## What the diff does not show
 
-These five questions cover most of what reached review. Have answers from the code before calling a change done, and say plainly when there is none.
+Have answers to these five questions from the code before calling a change done, and say plainly when there is none.
 
 1. What happens with two concurrent callers?
 2. What happens when it fails halfway and runs again?
@@ -60,24 +78,24 @@ These five questions cover most of what reached review. Have answers from the co
 4. Who else calls or renders what changed?
 5. What data now reaches a place it did not reach before?
 
-When he wants to check his own understanding of a change, ask him these and let him answer before you do. Do not turn it into a ritual on every change.
+When I want to check my own understanding of a change, ask me these and let me answer before you do. Do not turn it into a ritual on every change.
 
 Also say whether the change was run where it will really run, such as a browser for UI, or a production-like load for anything that changes what is loaded at startup. "Tests pass" and "it works in the real environment" are different claims.
 
 ## Fresh eyes
 
-The agent that designed or wrote something shares its own blind spots, and after a long session so does he. A reviewer that starts with no memory of the conversation does not, which is why a design that only makes sense with the conversation behind it fails in front of one. Use a fresh subagent for this, given only the written design and the files it references, never a summary of what was discussed and never your own conclusions. A review done in the same context is not this review. Use it when the change is risky enough to deserve it, not on every change.
+The agent that designed or wrote something shares its own blind spots, and after a long session so do I. A reviewer that starts with no memory of the conversation does not, which is why a design that only makes sense with the conversation behind it fails in front of one. Use a fresh subagent for this, given only the written design and the files it references, never a summary of what was discussed and never your own conclusions. A review done in the same context is not this review. Use it when the change is risky enough to deserve it, not on every change.
 
-- **Comprehension check.** Ask the fresh reviewer to say back, from the document alone, what the change does: the state, the transitions, and who owns what. Show him that paraphrase next to the intent. Where the two differ, the design is unclear or wrong on paper, and he can see it in a minute without reading the whole design again.
-- **Design review through his lenses.** Ask the fresh reviewer for what this skill cares about, not for general feedback: a transition with no answer for twice, concurrent, or halfway, a contract that says what it returns but not what it accepts, a caller that has to know how the layer below works, and a boundary that moves without being stated.
-- **Drift check after implementation.** Have a fresh reviewer compare the agreed design with the code that was written, and report where they differ. This is the direct way to find a boundary that moved by accident, or a transition that was implemented differently from what he accepted.
+- **Comprehension check.** Ask the fresh reviewer to say back, from the document alone, what the change does: the state, the transitions, and who owns what. Show me that paraphrase next to the intent. Where the two differ, the design is unclear or wrong on paper, and I can see it in a minute without reading the whole design again.
+- **Design review through these lenses.** Ask the fresh reviewer for what this skill cares about, not for general feedback: a transition with no answer for twice, concurrent, or halfway, a contract that says what it returns but not what it accepts, a caller that has to know how the layer below works, and a boundary that moves without being stated.
+- **Drift check after implementation.** Have a fresh reviewer compare the agreed design with the code that was written, and report where they differ. This is the direct way to find a boundary that moved by accident, or a transition that was implemented differently from what I accepted.
 
-A fresh reviewer produces a lot of findings, and passing them all on would cost him the attention this is meant to save. Triage them first: for each one, either propose the fix or say why you contest it, and bring him only the ones that change a decision. Re-check once after fixing. What is still open after that is a trade-off to state, not a reason for another round.
+A fresh reviewer produces a lot of findings, and passing them all on would cost me the attention this is meant to save. Triage them first: for each one, either propose the fix or say why you contest it, and bring me only the ones that change a decision. Re-check once after fixing. What is still open after that is a trade-off to state, not a reason for another round.
 
-## How to show him things
+## How to show me things
 
-- **Bottom line first.** Open with what he has to decide right now and what is blocked until he does, before any explanation. Put each decision as a question he can answer in a few words, with your recommendation and the one reason behind it. If nothing needs a decision, say that first, so he knows the rest is for reading and not for answering. Then give the supporting detail below, in order of how much it matters to those decisions, and after that the things he may want to comment on but that do not block anything. He should be able to stop reading after the first block and still unblock you.
-- **Short.** He is trying to protect his attention. Anything long gets skimmed, which is the failure this skill exists to prevent. Select what matters instead of covering everything.
-- **Pictures for structure.** State machines, boundaries, and where the coupling line sits are diagrams, with the `diagram` skill.
-- **Decisions named as decisions.** A boundary move, a patch chosen over a design, and an untested gap are his calls. Each one belongs in that opening block as its own choice, never inside the detail below it, so that agreeing with the whole does not silently approve it.
-- **Unknowns stated.** "I did not check this" is more useful to him than a confident summary.
+- **Bottom line first.** Open with what I have to decide right now and what is blocked until I do, before any explanation. Put each decision as a question I can answer in a few words, with your recommendation and the one reason behind it. If nothing needs a decision, say that first, so I know the rest is for reading and not for answering. Then give the supporting detail below, in order of how much it matters to those decisions, and after that the things I may want to comment on but that do not block anything. I should be able to stop reading after the first block and still unblock you.
+- **Short.** I am trying to protect my attention. Anything long gets skimmed, which is the failure this skill exists to prevent. Select what matters instead of covering everything.
+- **Pictures for structure.** State machines, boundaries, and where the coupling line sits are diagrams, not prose.
+- **Decisions named as decisions.** A boundary move, a patch chosen over a design, and an untested gap are my calls. Each one belongs in that opening block as its own choice, never inside the detail below it, so that agreeing with the whole does not silently approve it.
+- **Unknowns stated.** "I did not check this" is more useful to me than a confident summary.
